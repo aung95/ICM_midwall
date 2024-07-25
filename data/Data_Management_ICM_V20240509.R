@@ -10,7 +10,7 @@ library(here)
 
 # ------- IMPORT DATA ----
 
-folder <- "/Users/alexandreunger/Documents/PROJECTS/ICM/ICM_tradi/RProject_ICM_tradi/data"
+folder <- "/Users/alexandreunger/Documents/PROJECTS/ICM/ICM_midwall/ICM_midwall_RProject/data"
 df_all <- as.data.frame(read_excel(here(folder,"rawdata_donotmodify/ICM_data.xlsx")))
 
 # ------- OPERATION ON DATA -------
