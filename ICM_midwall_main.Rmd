@@ -1,0 +1,381 @@
+---
+title: "ICM_midwall_main"
+author: "Alexandre Unger"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    toc_depth: 2
+    toc_float: 
+      collapsed: false
+      smooth_scroll: true
+    number_sections: true
+    theme: united
+    highlight: tango
+    code_folding: "hide"
+    keep_md: yes
+    fig_width: 7
+    fig_height: 6
+    fig_caption: true
+---
+
+# Setting up
+```{r setup, include=FALSE}
+# Load necessary libraries
+library(knitr)
+library(here)
+
+# Get today's date and format it
+date_suffix <- format(Sys.Date(), "%Y-%m-%d")
+
+# Construct the full directory path for HTML figures
+figures_html_dir <- here::here("outputs", "figure_html", paste0("Fig_html-", date_suffix))
+tables_date_dir <- here::here("outputs", "tables", paste0("Tab-", date_suffix))
+figures_date_dir <- here::here("outputs", "figures", paste0("Fig-", date_suffix))
+
+# Check if the directory exists, if not, create it
+if (!dir.exists(figures_html_dir)) {
+  dir.create(figures_html_dir, recursive = TRUE)
+  message("Directory created: ", figures_html_dir)
+} else {
+  message("Directory already exists: ", figures_html_dir)
+}
+
+# Check and create the "tables" date-specific directory if it doesn't exist
+if (!dir.exists(tables_date_dir)) {
+  dir.create(tables_date_dir, recursive = TRUE)
+  message("Directory created: ", tables_date_dir)
+} else {
+  message("Directory already exists: ", tables_date_dir)
+}
+
+# Check and create the "figures" date-specific directory if it doesn't exist
+if (!dir.exists(figures_date_dir)) {
+  dir.create(figures_date_dir, recursive = TRUE)
+  message("Directory created: ", figures_date_dir)
+} else {
+  message("Directory already exists: ", figures_date_dir)
+}
+
+# Save the directory paths for later use in the script
+tables_output_dir <- tables_date_dir
+figures_output_dir <- figures_date_dir
+
+# Set knitr options with the absolute path
+opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  dev = "png",
+  dpi = 300,
+  fig.path = paste0(figures_html_dir, "/")
+)
+
+# Print the working directory and figure directory for verification
+print(paste("Working Directory:", getwd()))
+print(paste("Figure HTML Directory:", figures_html_dir))
+print(paste("Tables Directory:", tables_output_dir))
+print(paste("Figures Directory:", figures_output_dir))
+```
+# Package installation
+```{r Packages}
+library(rmarkdown)             # Documentation generation
+library(officer)              # Manipulating Microsoft Word documents
+library(flextable)            # Creating formatted tables in Microsoft Word documents
+library(tableHTML)            # Creating tables in HTML format
+library(gtsummary)            # Creating summary tables
+library(here)                 # Dealing with file path
+
+# ---- dealing with data
+library(dplyr)                # Data manipulation and transformation
+library(tidyr)                # Data tidying
+library(DataExplorer)         # Exploratory data analysis
+library(compareGroups)        # Comparing groups
+library(psych)                # Psychological statistics and data manipulation
+library(Hmisc)                # Miscellaneous functions for data analysis
+
+# ---- Survival analysis
+library(poptrend)             # Calculating p-trend in survival analysis
+library(survival)             # Survival analysis
+library(survivalAnalysis)     # Survival analysis functions
+library(survminer)            # Drawing survival curves
+library(adjustedCurves)       # Plotting adjusted survival curves
+library(pammtools)            # Plotting adjusted survival curves
+library(survIDINRI)           # Make reclassification and discrimination 
+library(glmnet)               # Regularized regression models
+library(olsrr)                # Variable selection at its best !
+library(StepReg)                # Variable selection at its best !
+
+# ---- Graphics
+library(ggplot2)              # Data visualization
+library(mctest)               # Multiple hypothesis testing --> assess colinearity between continuous variable
+library(corrplot)             # Visualizing correlation matrices
+library(fmsb)                 # Creating radar plots
+library(concreg)              # Plotting adjusted survival curves
+library(ggpubr)               # Associating the risk table when plotting
+
+
+# My packages
+# Function to source all R files in a specified directory
+source_all <- function(directory_path) {
+  # Obtain a list of R script files in the directory
+  r_files <- list.files(directory_path, pattern = "\\.R$", full.names = TRUE)
+  
+  # Source each file
+  for (file in r_files) {
+    source(file)
+  }
+}
+
+# Usage example:
+# Assuming your scripts are stored in the 'Functions' directory within your project
+source_all(here("Functions_R"))
+```
+
+# Data Download (RData).  
+Using the data.management_ICM_Tradi_V4 results directly saved in RData. \n
+* df_all : 6,082 patients \n
+* df_LGE : 3,591 patients
+```{r loading file}
+load(file = here("data","df_all.RData"))
+load(file = here("data","df_LGE.RData"))
+```
+
+# All population (N=6,081)
+## Descriptive
+### Tab1-descr-all-LGE_midwall_presence
+```{r Tab1-descr-all-LGE_midwall_presence}
+Descr_table = createTable(compareGroups(
+  CMR_LGE_midwall_presence ~ 
+    demo_age + demo_gender + demo_BMI + CV_risk_diabete + 
+    CV_risk_HTA + CV_risk_obesity + CV_risk_dyslipidemia + CV_risk_Smoking + 
+    
+    history_med_MI  + history_coronary_procedure + history_interv_PCI + 
+    history_interv_CABG + med_periph_atheroma + history_stroke + 
+    med_pacemaker + med_CKD + history_hospit_HF + history_AFib + clini_NYHA + 
+    clini_cardiac_rythm + 
+    
+    CMR_LVEF + CMR_LVEDV + 
+    CMR_LVESV + CMR_LV_mass + CMR_RV_dysfunction + 
+    
+    CMR_LGE_presence_ischemic_and_midwall +
+    
+    CMR_LGE_ischemic_presence + 
+    CMR_LGE_ischemic_extent_count +
+    CMR_LGE_ischemic_extent_categ +
+    CMR_LGE_ischemic_transmurality +
+    CMR_LGE_ischemic_location_4 +
+    
+    CMR_LGE_midwall_presence +
+    CMR_LGE_midwall_extent_count + 
+    CMR_LGE_midwall_extent_categ +
+    CMR_LGE_midwall_location_3 + 
+    CMR_LGE_midwall_location_4 +
+    CMR_LGE_midwall_anterior +
+    CMR_LGE_midwall_septal +
+    CMR_LGE_midwall_inferior +
+    CMR_LGE_midwall_lateral +
+    CMR_LGE_midwall_apical +
+    
+    outcome_revascularisation_90days,
+  data= df_all,
+  method = 1, conf.level = 0.95),
+  hide.no = "No",
+  show.all=T, show.p.overall = T) 
+
+export2md(Descr_table, strip=TRUE, first.strip=TRUE)
+
+export2word(x = Descr_table, 
+            file = here(tables_output_dir, paste0("Tab1-descr-all-midwall_LGE_presence-",Sys.Date(), ".docx")), 
+            which.table="descr", nmax=TRUE, header.labels=c(), 
+            caption=NULL, strip=FALSE, first.strip=FALSE, background="#D2D2D2",
+            size=NULL, header.background=NULL, header.color=NULL)
+```
+
+## Details of comparison {.tabset}
+### LVEF
+```{r figures_LVEF_comp}
+# Parametric test (t-test)
+t_test_LVEF <- t.test(
+  subset(df_all, CMR_LGE_midwall_presence == "A_No_midwall_LGE")$CMR_LVEF,
+  subset(df_all, CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE")$CMR_LVEF
+)
+
+# Non-parametric test (Wilcoxon test)
+wilcox_test_LVEF <- wilcox.test(
+  subset(df_all, CMR_LGE_midwall_presence == "A_No_midwall_LGE")$CMR_LVEF,
+  subset(df_all, CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE")$CMR_LVEF
+)
+
+# Create a combined dataset for plotting
+combined_data_LVEF <- df_all %>%
+  filter(CMR_LGE_midwall_presence %in% c("A_No_midwall_LGE", "B_Presence_of_midwall_LGE")) %>%
+  mutate(Group = case_when(
+    CMR_LGE_midwall_presence == "A_No_midwall_LGE" ~ "No Midwall LGE",
+    CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE" ~ "Midwall LGE"
+  ))
+
+# Generate a density plot using ggplot2
+ggplot(combined_data_LVEF, aes(x = CMR_LVEF, color = Group, fill = Group)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Density Plot of CMR_LVEF by Midwall LGE Presence",
+       x = "CMR_LVEF") +
+  theme_minimal() +
+  annotate("text", x = -Inf, y = Inf, label = paste0("t-test p-value: ", round(t_test_LVEF$p.value, 3)), hjust = -0.1, vjust = 1.5, size = 5, color = "black") +
+  annotate("text", x = -Inf, y = Inf, label = paste0("Wilcoxon p-value: ", round(wilcox_test_LVEF$p.value, 3)), hjust = -0.1, vjust = 3, size = 5, color = "black")
+
+```
+
+### LVEDV
+```{r figures_LVED_comp}
+# Parametric test (t-test)
+t_test_LVEDV <- t.test(
+  subset(df_all, CMR_LGE_midwall_presence == "A_No_midwall_LGE")$CMR_LVEDV,
+  subset(df_all, CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE")$CMR_LVEDV
+)
+
+# Non-parametric test (Wilcoxon test)
+wilcox_test_LVEDV <- wilcox.test(
+  subset(df_all, CMR_LGE_midwall_presence == "A_No_midwall_LGE")$CMR_LVEDV,
+  subset(df_all, CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE")$CMR_LVEDV
+)
+
+# Create a combined dataset for plotting
+combined_data_LVEDV <- df_all %>%
+  filter(CMR_LGE_midwall_presence %in% c("A_No_midwall_LGE", "B_Presence_of_midwall_LGE")) %>%
+  mutate(Group = case_when(
+    CMR_LGE_midwall_presence == "A_No_midwall_LGE" ~ "No Midwall LGE",
+    CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE" ~ "Midwall LGE"
+  ))
+
+# Generate a density plot using ggplot2
+ggplot(combined_data_LVEDV, aes(x = CMR_LVEDV, color = Group, fill = Group)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Density Plot of CMR_LVEDV by Midwall LGE Presence",
+       x = "CMR_LVEDV") +
+  theme_minimal() +
+  annotate("text", x = -Inf, y = Inf, label = paste0("t-test p-value: ", round(t_test_LVEDV$p.value, 3)), hjust = -0.1, vjust = 1.5, size = 5, color = "black") +
+  annotate("text", x = -Inf, y = Inf, label = paste0("Wilcoxon p-value: ", round(wilcox_test_LVEDV$p.value, 3)), hjust = -0.1, vjust = 3, size = 5, color = "black")
+
+```
+
+### Tab2-descr-all-center
+```{r Tab2-descr-all-center}
+Descr_table = createTable(compareGroups(
+  demo_center ~ 
+    demo_age + demo_gender + demo_BMI + CV_risk_diabete + 
+    CV_risk_HTA + CV_risk_obesity + CV_risk_dyslipidemia + CV_risk_Smoking + 
+    
+    history_med_MI  + history_coronary_procedure + history_interv_PCI + 
+    history_interv_CABG + med_periph_atheroma + history_stroke + 
+    med_pacemaker + med_CKD + history_hospit_HF + history_AFib + clini_NYHA + 
+    clini_cardiac_rythm + 
+    
+    CMR_LVEF + CMR_LVEDV + 
+    CMR_LVESV + CMR_LV_mass + CMR_RV_dysfunction + 
+    
+    CMR_LGE_ischemic_presence + 
+    CMR_LGE_ischemic_extent_count +
+    CMR_LGE_ischemic_transmurality +
+    CMR_LGE_ischemic_location_4 +
+    
+    CMR_LGE_midwall_presence +
+    CMR_LGE_midwall_extent_count + 
+    CMR_LGE_midwall_location_3 + 
+    CMR_LGE_midwall_location_4 +
+    
+    CMR_LGE_midwall_anterior +
+    CMR_LGE_midwall_septal +
+    CMR_LGE_midwall_inferior +
+    CMR_LGE_midwall_lateral +
+    CMR_LGE_midwall_apical +
+    
+    outcome_revascularisation_90days,
+  data = df_all,
+  method = 1, conf.level = 0.95),
+  hide.no = "No",
+  show.all=T, show.p.overall = T)
+
+export2md(Descr_table, strip=TRUE, first.strip=TRUE)
+
+export2word(x = Descr_table, 
+            file = here(tables_output_dir, paste0("Tab2-descr-all-center-",Sys.Date(), ".docx")), 
+            which.table="descr", nmax=TRUE, header.labels=c(), 
+            caption=NULL, strip=FALSE, first.strip=FALSE, background="#D2D2D2",
+            size=NULL, header.background=NULL, header.color=NULL)
+```
+
+## Survival
+### Tab3-univ-all-death
+```{r Tab3-univ-all-death}
+df_selected <- df_all %>%
+  mutate(
+    surv.event = Surv(
+      time = outcome_FU_time_death,
+      event = outcome_death
+    ),
+    CMR_LVEF_5 = CMR_LVEF/5,
+    CMR_LVEDV_5 = CMR_LVEDV/10,
+    CMR_LVESV_5 = CMR_LVESV/10
+  )
+
+model <- coxph(formula = surv.event ~ CMR_LGE_midwall_presence, data = df_selected)
+print("CMR_LGE_midwall_presence univariate analysis for all-cause death")
+extract_model_stats(model, conf_level = 0.95, show.coef = F, decimals = 3)
+
+Descr_table = createTable(compareGroups(
+  surv.event ~ 
+    demo_age + demo_gender + demo_BMI + CV_risk_diabete + 
+    CV_risk_HTA + CV_risk_obesity + CV_risk_dyslipidemia + CV_risk_Smoking + 
+    
+    history_med_MI  + history_coronary_procedure + history_interv_PCI + 
+    history_interv_CABG + med_periph_atheroma + history_stroke + 
+    med_pacemaker + med_CKD + history_hospit_HF + history_AFib + clini_NYHA + 
+    clini_cardiac_rythm + 
+    
+   outcome_revascularisation_90days +
+    
+    CMR_LVEF_5 + CMR_LVEDV_5 + 
+    CMR_LVESV_5 + CMR_LV_mass + CMR_RV_dysfunction + 
+    
+    CMR_LGE_presence_ischemic_and_midwall +
+    
+    CMR_LGE_ischemic_presence + 
+    CMR_LGE_ischemic_extent_count +
+    CMR_LGE_ischemic_extent_categ +
+    CMR_LGE_ischemic_transmurality +
+    CMR_LGE_ischemic_location_4 +
+    
+    CMR_LGE_ischemic_anterior + 
+    CMR_LGE_ischemic_septal +
+    CMR_LGE_ischemic_inferior +
+    CMR_LGE_ischemic_lateral +
+    CMR_LGE_ischemic_Apical +
+    
+    CMR_LGE_midwall_presence +
+    CMR_LGE_midwall_extent_count + 
+    CMR_LGE_midwall_extent_categ +
+    CMR_LGE_midwall_location_3 + 
+    CMR_LGE_midwall_location_4 +
+    CMR_LGE_midwall_anterior +
+    CMR_LGE_midwall_septal +
+    CMR_LGE_midwall_inferior +
+    CMR_LGE_midwall_lateral +
+    CMR_LGE_midwall_apical,
+  data= df_selected,
+  method = 1, conf.level = 0.95),
+  hide.no = "No",
+  show.ratio =T, show.p.ratio =  T) 
+
+export2md(Descr_table, strip=TRUE, first.strip=TRUE)
+
+export2word(x = Descr_table, 
+            file = here(tables_output_dir, paste0("Tab4-univ-all-death-",Sys.Date(), ".docx")), 
+            which.table="descr", nmax=TRUE, header.labels=c(), 
+            caption=NULL, strip=FALSE, first.strip=FALSE, background="#D2D2D2",
+            size=NULL, header.background=NULL, header.color=NULL)
+
+
+
+```

@@ -1,0 +1,1886 @@
+---
+title: "ICM_midwall_main"
+author: "Alexandre Unger"
+date: "2024-07-25"
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    toc_depth: 2
+    toc_float: 
+      collapsed: false
+      smooth_scroll: true
+    number_sections: true
+    theme: united
+    highlight: tango
+    code_folding: "hide"
+    keep_md: yes
+    fig_width: 7
+    fig_height: 6
+    fig_caption: true
+---
+
+# Setting up
+
+# Package installation
+
+```r
+library(rmarkdown)             # Documentation generation
+library(officer)              # Manipulating Microsoft Word documents
+library(flextable)            # Creating formatted tables in Microsoft Word documents
+library(tableHTML)            # Creating tables in HTML format
+library(gtsummary)            # Creating summary tables
+library(here)                 # Dealing with file path
+
+# ---- dealing with data
+library(dplyr)                # Data manipulation and transformation
+library(tidyr)                # Data tidying
+library(DataExplorer)         # Exploratory data analysis
+library(compareGroups)        # Comparing groups
+library(psych)                # Psychological statistics and data manipulation
+library(Hmisc)                # Miscellaneous functions for data analysis
+
+# ---- Survival analysis
+library(poptrend)             # Calculating p-trend in survival analysis
+library(survival)             # Survival analysis
+library(survivalAnalysis)     # Survival analysis functions
+library(survminer)            # Drawing survival curves
+library(adjustedCurves)       # Plotting adjusted survival curves
+library(pammtools)            # Plotting adjusted survival curves
+library(survIDINRI)           # Make reclassification and discrimination 
+library(glmnet)               # Regularized regression models
+library(olsrr)                # Variable selection at its best !
+library(StepReg)                # Variable selection at its best !
+
+# ---- Graphics
+library(ggplot2)              # Data visualization
+library(mctest)               # Multiple hypothesis testing --> assess colinearity between continuous variable
+library(corrplot)             # Visualizing correlation matrices
+library(fmsb)                 # Creating radar plots
+library(concreg)              # Plotting adjusted survival curves
+library(ggpubr)               # Associating the risk table when plotting
+
+
+# My packages
+# Function to source all R files in a specified directory
+source_all <- function(directory_path) {
+  # Obtain a list of R script files in the directory
+  r_files <- list.files(directory_path, pattern = "\\.R$", full.names = TRUE)
+  
+  # Source each file
+  for (file in r_files) {
+    source(file)
+  }
+}
+
+# Usage example:
+# Assuming your scripts are stored in the 'Functions' directory within your project
+source_all(here("Functions_R"))
+```
+
+# Data Download (RData).  
+Using the data.management_ICM_Tradi_V4 results directly saved in RData. \n
+* df_all : 6,082 patients \n
+* df_LGE : 3,591 patients
+
+```r
+load(file = here("data","df_all.RData"))
+load(file = here("data","df_LGE.RData"))
+```
+
+# All population (N=6,081)
+## Descriptive
+### Tab1-descr-all-LGE_midwall_presence
+
+```r
+Descr_table = createTable(compareGroups(
+  CMR_LGE_midwall_presence ~ 
+    demo_age + demo_gender + demo_BMI + CV_risk_diabete + 
+    CV_risk_HTA + CV_risk_obesity + CV_risk_dyslipidemia + CV_risk_Smoking + 
+    
+    history_med_MI  + history_coronary_procedure + history_interv_PCI + 
+    history_interv_CABG + med_periph_atheroma + history_stroke + 
+    med_pacemaker + med_CKD + history_hospit_HF + history_AFib + clini_NYHA + 
+    clini_cardiac_rythm + 
+    
+    CMR_LVEF + CMR_LVEDV + 
+    CMR_LVESV + CMR_LV_mass + CMR_RV_dysfunction + 
+    
+    CMR_LGE_presence_ischemic_and_midwall +
+    
+    CMR_LGE_ischemic_presence + 
+    CMR_LGE_ischemic_extent_count +
+    CMR_LGE_ischemic_extent_categ +
+    CMR_LGE_ischemic_transmurality +
+    CMR_LGE_ischemic_location_4 +
+    
+    CMR_LGE_midwall_presence +
+    CMR_LGE_midwall_extent_count + 
+    CMR_LGE_midwall_extent_categ +
+    CMR_LGE_midwall_location_3 + 
+    CMR_LGE_midwall_location_4 +
+    CMR_LGE_midwall_anterior +
+    CMR_LGE_midwall_septal +
+    CMR_LGE_midwall_inferior +
+    CMR_LGE_midwall_lateral +
+    CMR_LGE_midwall_apical +
+    
+    outcome_revascularisation_90days,
+  data= df_all,
+  method = 1, conf.level = 0.95),
+  hide.no = "No",
+  show.all=T, show.p.overall = T) 
+
+export2md(Descr_table, strip=TRUE, first.strip=TRUE)
+```
+
+<table class="table table-condensed" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>Summary descriptives table by groups of `CMR_LGE_midwall_presence'</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:center;"> [ALL] </th>
+   <th style="text-align:center;"> A_No_midwall_LGE </th>
+   <th style="text-align:center;"> B_Presence_of_midwall_LGE </th>
+   <th style="text-align:center;"> p.overall </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;font-style: italic;border-bottom: 1px solid grey">  </td>
+   <td style="text-align:center;font-style: italic;border-bottom: 1px solid grey"> N=6082 </td>
+   <td style="text-align:center;font-style: italic;border-bottom: 1px solid grey"> N=5380 </td>
+   <td style="text-align:center;font-style: italic;border-bottom: 1px solid grey"> N=702 </td>
+   <td style="text-align:center;font-style: italic;border-bottom: 1px solid grey">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> demo_age </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 64.5 (11.8) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 64.4 (11.8) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 65.8 (11.6) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.002 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> demo_gender </td>
+   <td style="text-align:center;"> 4419 (72.7%) </td>
+   <td style="text-align:center;"> 3894 (72.4%) </td>
+   <td style="text-align:center;"> 525 (74.8%) </td>
+   <td style="text-align:center;"> 0.193 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> demo_BMI </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 27.7 (5.33) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 27.6 (5.31) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 28.3 (5.43) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.005 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV_risk_diabete </td>
+   <td style="text-align:center;"> 2309 (38.0%) </td>
+   <td style="text-align:center;"> 1985 (36.9%) </td>
+   <td style="text-align:center;"> 324 (46.2%) </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CV_risk_HTA </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 3144 (51.7%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2665 (49.5%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 479 (68.2%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV_risk_obesity </td>
+   <td style="text-align:center;"> 1687 (27.7%) </td>
+   <td style="text-align:center;"> 1459 (27.1%) </td>
+   <td style="text-align:center;"> 228 (32.5%) </td>
+   <td style="text-align:center;"> 0.003 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CV_risk_dyslipidemia </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 3005 (49.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2619 (48.7%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 386 (55.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.002 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV_risk_Smoking </td>
+   <td style="text-align:center;"> 1285 (21.1%) </td>
+   <td style="text-align:center;"> 1144 (21.3%) </td>
+   <td style="text-align:center;"> 141 (20.1%) </td>
+   <td style="text-align:center;"> 0.503 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> history_med_MI </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2354 (38.7%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2082 (38.7%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 272 (38.7%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_coronary_procedure </td>
+   <td style="text-align:center;"> 5394 (88.7%) </td>
+   <td style="text-align:center;"> 4775 (88.8%) </td>
+   <td style="text-align:center;"> 619 (88.2%) </td>
+   <td style="text-align:center;"> 0.696 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> history_interv_PCI </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 380 (6.25%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 336 (6.25%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 44 (6.27%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_interv_CABG </td>
+   <td style="text-align:center;"> 5085 (83.6%) </td>
+   <td style="text-align:center;"> 4501 (83.7%) </td>
+   <td style="text-align:center;"> 584 (83.2%) </td>
+   <td style="text-align:center;"> 0.793 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> med_periph_atheroma </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 344 (5.66%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 298 (5.54%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 46 (6.55%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.314 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_stroke </td>
+   <td style="text-align:center;"> 186 (3.06%) </td>
+   <td style="text-align:center;"> 165 (3.07%) </td>
+   <td style="text-align:center;"> 21 (2.99%) </td>
+   <td style="text-align:center;"> 1.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> med_pacemaker </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 41 (0.67%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 28 (0.52%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 13 (1.85%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> med_CKD </td>
+   <td style="text-align:center;"> 121 (1.99%) </td>
+   <td style="text-align:center;"> 93 (1.73%) </td>
+   <td style="text-align:center;"> 28 (3.99%) </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> history_hospit_HF </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 368 (6.05%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 332 (6.17%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 36 (5.13%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.315 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_AFib </td>
+   <td style="text-align:center;"> 453 (7.45%) </td>
+   <td style="text-align:center;"> 377 (7.01%) </td>
+   <td style="text-align:center;"> 76 (10.8%) </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> clini_NYHA </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 753 (12.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 681 (12.7%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 72 (10.3%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.079 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> clini_cardiac_rythm </td>
+   <td style="text-align:center;"> 426 (7.00%) </td>
+   <td style="text-align:center;"> 360 (6.69%) </td>
+   <td style="text-align:center;"> 66 (9.40%) </td>
+   <td style="text-align:center;"> 0.010 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LVEF </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 43.7 (5.70) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 43.8 (5.69) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 43.3 (5.78) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.034 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LVEDV </td>
+   <td style="text-align:center;"> 103 (21.5) </td>
+   <td style="text-align:center;"> 103 (21.5) </td>
+   <td style="text-align:center;"> 104 (21.6) </td>
+   <td style="text-align:center;"> 0.188 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LVESV </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 58.6 (17.8) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 58.5 (17.8) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 59.6 (17.6) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.102 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LV_mass </td>
+   <td style="text-align:center;"> 91.0 (19.5) </td>
+   <td style="text-align:center;"> 90.7 (19.7) </td>
+   <td style="text-align:center;"> 93.5 (17.8) </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_RV_dysfunction </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 218 (3.58%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 188 (3.49%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 30 (4.27%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.349 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_presence_ischemic_and_midwall </td>
+   <td style="text-align:center;"> 354 (5.82%) </td>
+   <td style="text-align:center;"> 0 (0.00%) </td>
+   <td style="text-align:center;"> 354 (50.4%) </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_ischemic_presence: </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> No_ischemic_LGE </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2491 (41.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2143 (39.8%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 348 (49.6%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> Presence_of_ischemic_LGE </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 3591 (59.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 3237 (60.2%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 354 (50.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_ischemic_extent_count </td>
+   <td style="text-align:center;"> 1.83 (1.96) </td>
+   <td style="text-align:center;"> 1.83 (1.91) </td>
+   <td style="text-align:center;"> 1.83 (2.26) </td>
+   <td style="text-align:center;"> 0.998 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_ischemic_extent_categ: </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> A_No_ischemic_LGE </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2491 (41.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2143 (39.8%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 348 (49.6%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> B_1_2_segments </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1392 (22.9%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1282 (23.8%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 110 (15.7%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> C_3_5_segments </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1953 (32.1%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1774 (33.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 179 (25.5%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> D_more6_segments </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 246 (4.04%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 181 (3.36%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 65 (9.26%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_ischemic_transmurality: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> A_No_ischemic_LGE </td>
+   <td style="text-align:center;"> 2491 (41.0%) </td>
+   <td style="text-align:center;"> 2143 (39.8%) </td>
+   <td style="text-align:center;"> 348 (49.6%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> B_Subendocardial&lt;50% </td>
+   <td style="text-align:center;"> 1698 (27.9%) </td>
+   <td style="text-align:center;"> 1572 (29.2%) </td>
+   <td style="text-align:center;"> 126 (17.9%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> C_Subendocardial≥50% </td>
+   <td style="text-align:center;"> 1549 (25.5%) </td>
+   <td style="text-align:center;"> 1392 (25.9%) </td>
+   <td style="text-align:center;"> 157 (22.4%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> D_Transmural </td>
+   <td style="text-align:center;"> 344 (5.66%) </td>
+   <td style="text-align:center;"> 273 (5.07%) </td>
+   <td style="text-align:center;"> 71 (10.1%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_ischemic_location_4: </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> A_No_ischemic_LGE </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2491 (41.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2143 (39.8%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 348 (49.6%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> B_Neither_anterior_nor_septal </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2662 (43.8%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2445 (45.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 217 (30.9%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> C_Anterior_without_septal </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 422 (6.94%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 379 (7.04%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 43 (6.13%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> D_Septal </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 507 (8.34%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 413 (7.68%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 94 (13.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_presence: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> A_No_midwall_LGE </td>
+   <td style="text-align:center;"> 5380 (88.5%) </td>
+   <td style="text-align:center;"> 5380 (100%) </td>
+   <td style="text-align:center;"> 0 (0.00%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> B_Presence_of_midwall_LGE </td>
+   <td style="text-align:center;"> 702 (11.5%) </td>
+   <td style="text-align:center;"> 0 (0.00%) </td>
+   <td style="text-align:center;"> 702 (100%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_extent_count </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.13 (0.39) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.00 (0.00) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.14 (0.37) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_extent_categ: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> None </td>
+   <td style="text-align:center;"> 5380 (88.5%) </td>
+   <td style="text-align:center;"> 5380 (100%) </td>
+   <td style="text-align:center;"> 0 (0.00%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Low_=1 </td>
+   <td style="text-align:center;"> 610 (10.0%) </td>
+   <td style="text-align:center;"> 0 (0.00%) </td>
+   <td style="text-align:center;"> 610 (86.9%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> High_&gt;1 </td>
+   <td style="text-align:center;"> 92 (1.51%) </td>
+   <td style="text-align:center;"> 0 (0.00%) </td>
+   <td style="text-align:center;"> 92 (13.1%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_location_3: </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> No_midwall_LGE </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 5380 (88.5%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 5380 (100%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0 (0.00%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> Midwall_LGE_not_at_risk </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 471 (7.74%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0 (0.00%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 471 (67.1%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> At_risk_midwall_LGE_(septal_and/or_lateral) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 231 (3.80%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0 (0.00%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 231 (32.9%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_location_4: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> No_midwall_LGE </td>
+   <td style="text-align:center;"> 5380 (88.5%) </td>
+   <td style="text-align:center;"> 5380 (100%) </td>
+   <td style="text-align:center;"> 0 (0.00%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Midwall_LGE_not_at_risk </td>
+   <td style="text-align:center;"> 471 (7.74%) </td>
+   <td style="text-align:center;"> 0 (0.00%) </td>
+   <td style="text-align:center;"> 471 (67.1%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Lateral_midwall_LGE </td>
+   <td style="text-align:center;"> 118 (1.94%) </td>
+   <td style="text-align:center;"> 0 (0.00%) </td>
+   <td style="text-align:center;"> 118 (16.8%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Septal_Midwall_LGE </td>
+   <td style="text-align:center;"> 113 (1.86%) </td>
+   <td style="text-align:center;"> 0 (0.00%) </td>
+   <td style="text-align:center;"> 113 (16.1%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_anterior </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 140 (2.30%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0 (0.00%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 140 (19.9%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_septal </td>
+   <td style="text-align:center;"> 113 (1.86%) </td>
+   <td style="text-align:center;"> 0 (0.00%) </td>
+   <td style="text-align:center;"> 113 (16.1%) </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_inferior </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 212 (3.49%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0 (0.00%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 212 (30.2%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_lateral </td>
+   <td style="text-align:center;"> 124 (2.04%) </td>
+   <td style="text-align:center;"> 0 (0.00%) </td>
+   <td style="text-align:center;"> 124 (17.7%) </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_apical </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 146 (2.40%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0 (0.00%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 146 (20.8%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> outcome_revascularisation_90days </td>
+   <td style="text-align:center;"> 2773 (45.6%) </td>
+   <td style="text-align:center;"> 2545 (47.3%) </td>
+   <td style="text-align:center;"> 228 (32.5%) </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+export2word(x = Descr_table, 
+            file = here(tables_output_dir, paste0("Tab1-descr-all-midwall_LGE_presence-",Sys.Date(), ".docx")), 
+            which.table="descr", nmax=TRUE, header.labels=c(), 
+            caption=NULL, strip=FALSE, first.strip=FALSE, background="#D2D2D2",
+            size=NULL, header.background=NULL, header.color=NULL)
+```
+
+## Details of comparison {.tabset}
+### LVEF
+
+```r
+# Parametric test (t-test)
+t_test_LVEF <- t.test(
+  subset(df_all, CMR_LGE_midwall_presence == "A_No_midwall_LGE")$CMR_LVEF,
+  subset(df_all, CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE")$CMR_LVEF
+)
+
+# Non-parametric test (Wilcoxon test)
+wilcox_test_LVEF <- wilcox.test(
+  subset(df_all, CMR_LGE_midwall_presence == "A_No_midwall_LGE")$CMR_LVEF,
+  subset(df_all, CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE")$CMR_LVEF
+)
+
+# Create a combined dataset for plotting
+combined_data_LVEF <- df_all %>%
+  filter(CMR_LGE_midwall_presence %in% c("A_No_midwall_LGE", "B_Presence_of_midwall_LGE")) %>%
+  mutate(Group = case_when(
+    CMR_LGE_midwall_presence == "A_No_midwall_LGE" ~ "No Midwall LGE",
+    CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE" ~ "Midwall LGE"
+  ))
+
+# Generate a density plot using ggplot2
+ggplot(combined_data_LVEF, aes(x = CMR_LVEF, color = Group, fill = Group)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Density Plot of CMR_LVEF by Midwall LGE Presence",
+       x = "CMR_LVEF") +
+  theme_minimal() +
+  annotate("text", x = -Inf, y = Inf, label = paste0("t-test p-value: ", round(t_test_LVEF$p.value, 3)), hjust = -0.1, vjust = 1.5, size = 5, color = "black") +
+  annotate("text", x = -Inf, y = Inf, label = paste0("Wilcoxon p-value: ", round(wilcox_test_LVEF$p.value, 3)), hjust = -0.1, vjust = 3, size = 5, color = "black")
+```
+
+![](/Users/alexandreunger/Documents/PROJECTS/ICM/ICM_midwall/ICM_midwall_RProject/outputs/figure_html/Fig_html-2024-07-25/figures_LVEF_comp-1.png)<!-- -->
+
+### LVEDV
+
+```r
+# Parametric test (t-test)
+t_test_LVEDV <- t.test(
+  subset(df_all, CMR_LGE_midwall_presence == "A_No_midwall_LGE")$CMR_LVEDV,
+  subset(df_all, CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE")$CMR_LVEDV
+)
+
+# Non-parametric test (Wilcoxon test)
+wilcox_test_LVEDV <- wilcox.test(
+  subset(df_all, CMR_LGE_midwall_presence == "A_No_midwall_LGE")$CMR_LVEDV,
+  subset(df_all, CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE")$CMR_LVEDV
+)
+
+# Create a combined dataset for plotting
+combined_data_LVEDV <- df_all %>%
+  filter(CMR_LGE_midwall_presence %in% c("A_No_midwall_LGE", "B_Presence_of_midwall_LGE")) %>%
+  mutate(Group = case_when(
+    CMR_LGE_midwall_presence == "A_No_midwall_LGE" ~ "No Midwall LGE",
+    CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE" ~ "Midwall LGE"
+  ))
+
+# Generate a density plot using ggplot2
+ggplot(combined_data_LVEDV, aes(x = CMR_LVEDV, color = Group, fill = Group)) +
+  geom_density(alpha = 0.4) +
+  labs(title = "Density Plot of CMR_LVEDV by Midwall LGE Presence",
+       x = "CMR_LVEDV") +
+  theme_minimal() +
+  annotate("text", x = -Inf, y = Inf, label = paste0("t-test p-value: ", round(t_test_LVEDV$p.value, 3)), hjust = -0.1, vjust = 1.5, size = 5, color = "black") +
+  annotate("text", x = -Inf, y = Inf, label = paste0("Wilcoxon p-value: ", round(wilcox_test_LVEDV$p.value, 3)), hjust = -0.1, vjust = 3, size = 5, color = "black")
+```
+
+![](/Users/alexandreunger/Documents/PROJECTS/ICM/ICM_midwall/ICM_midwall_RProject/outputs/figure_html/Fig_html-2024-07-25/figures_LVED_comp-1.png)<!-- -->
+
+### Tab2-descr-all-center
+
+```r
+Descr_table = createTable(compareGroups(
+  demo_center ~ 
+    demo_age + demo_gender + demo_BMI + CV_risk_diabete + 
+    CV_risk_HTA + CV_risk_obesity + CV_risk_dyslipidemia + CV_risk_Smoking + 
+    
+    history_med_MI  + history_coronary_procedure + history_interv_PCI + 
+    history_interv_CABG + med_periph_atheroma + history_stroke + 
+    med_pacemaker + med_CKD + history_hospit_HF + history_AFib + clini_NYHA + 
+    clini_cardiac_rythm + 
+    
+    CMR_LVEF + CMR_LVEDV + 
+    CMR_LVESV + CMR_LV_mass + CMR_RV_dysfunction + 
+    
+    CMR_LGE_ischemic_presence + 
+    CMR_LGE_ischemic_extent_count +
+    CMR_LGE_ischemic_transmurality +
+    CMR_LGE_ischemic_location_4 +
+    
+    CMR_LGE_midwall_presence +
+    CMR_LGE_midwall_extent_count + 
+    CMR_LGE_midwall_location_3 + 
+    CMR_LGE_midwall_location_4 +
+    
+    CMR_LGE_midwall_anterior +
+    CMR_LGE_midwall_septal +
+    CMR_LGE_midwall_inferior +
+    CMR_LGE_midwall_lateral +
+    CMR_LGE_midwall_apical +
+    
+    outcome_revascularisation_90days,
+  data = df_all,
+  method = 1, conf.level = 0.95),
+  hide.no = "No",
+  show.all=T, show.p.overall = T)
+
+export2md(Descr_table, strip=TRUE, first.strip=TRUE)
+```
+
+<table class="table table-condensed" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>Summary descriptives table by groups of `demo_center'</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:center;"> [ALL] </th>
+   <th style="text-align:center;"> ICPS </th>
+   <th style="text-align:center;"> Lariboisiere </th>
+   <th style="text-align:center;"> p.overall </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;font-style: italic;border-bottom: 1px solid grey">  </td>
+   <td style="text-align:center;font-style: italic;border-bottom: 1px solid grey"> N=6082 </td>
+   <td style="text-align:center;font-style: italic;border-bottom: 1px solid grey"> N=5214 </td>
+   <td style="text-align:center;font-style: italic;border-bottom: 1px solid grey"> N=868 </td>
+   <td style="text-align:center;font-style: italic;border-bottom: 1px solid grey">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> demo_age </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 64.5 (11.8) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 64.4 (11.9) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 65.3 (11.4) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.026 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> demo_gender </td>
+   <td style="text-align:center;"> 4419 (72.7%) </td>
+   <td style="text-align:center;"> 3738 (71.7%) </td>
+   <td style="text-align:center;"> 681 (78.5%) </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> demo_BMI </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 27.7 (5.33) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 27.7 (5.34) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 27.8 (5.24) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.658 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV_risk_diabete </td>
+   <td style="text-align:center;"> 2309 (38.0%) </td>
+   <td style="text-align:center;"> 1850 (35.5%) </td>
+   <td style="text-align:center;"> 459 (52.9%) </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CV_risk_HTA </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 3144 (51.7%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2698 (51.7%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 446 (51.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.872 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV_risk_obesity </td>
+   <td style="text-align:center;"> 1687 (27.7%) </td>
+   <td style="text-align:center;"> 1452 (27.8%) </td>
+   <td style="text-align:center;"> 235 (27.1%) </td>
+   <td style="text-align:center;"> 0.667 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CV_risk_dyslipidemia </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 3005 (49.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2571 (49.3%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 434 (50.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.734 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV_risk_Smoking </td>
+   <td style="text-align:center;"> 1285 (21.1%) </td>
+   <td style="text-align:center;"> 1092 (20.9%) </td>
+   <td style="text-align:center;"> 193 (22.2%) </td>
+   <td style="text-align:center;"> 0.413 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> history_med_MI </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2354 (38.7%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1929 (37.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 425 (49.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_coronary_procedure </td>
+   <td style="text-align:center;"> 5394 (88.7%) </td>
+   <td style="text-align:center;"> 4657 (89.3%) </td>
+   <td style="text-align:center;"> 737 (84.9%) </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> history_interv_PCI </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 380 (6.25%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 278 (5.33%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 102 (11.8%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_interv_CABG </td>
+   <td style="text-align:center;"> 5085 (83.6%) </td>
+   <td style="text-align:center;"> 4439 (85.1%) </td>
+   <td style="text-align:center;"> 646 (74.4%) </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> med_periph_atheroma </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 344 (5.66%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 294 (5.64%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 50 (5.76%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.949 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_stroke </td>
+   <td style="text-align:center;"> 186 (3.06%) </td>
+   <td style="text-align:center;"> 160 (3.07%) </td>
+   <td style="text-align:center;"> 26 (3.00%) </td>
+   <td style="text-align:center;"> 0.992 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> med_pacemaker </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 41 (0.67%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 37 (0.71%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 4 (0.46%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.545 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> med_CKD </td>
+   <td style="text-align:center;"> 121 (1.99%) </td>
+   <td style="text-align:center;"> 111 (2.13%) </td>
+   <td style="text-align:center;"> 10 (1.15%) </td>
+   <td style="text-align:center;"> 0.076 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> history_hospit_HF </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 368 (6.05%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 306 (5.87%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 62 (7.14%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.167 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_AFib </td>
+   <td style="text-align:center;"> 453 (7.45%) </td>
+   <td style="text-align:center;"> 395 (7.58%) </td>
+   <td style="text-align:center;"> 58 (6.68%) </td>
+   <td style="text-align:center;"> 0.390 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> clini_NYHA </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 753 (12.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 645 (12.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 108 (12.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.997 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> clini_cardiac_rythm </td>
+   <td style="text-align:center;"> 426 (7.00%) </td>
+   <td style="text-align:center;"> 367 (7.04%) </td>
+   <td style="text-align:center;"> 59 (6.80%) </td>
+   <td style="text-align:center;"> 0.852 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LVEF </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 43.7 (5.70) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 43.8 (5.53) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 43.1 (6.61) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.003 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LVEDV </td>
+   <td style="text-align:center;"> 103 (21.5) </td>
+   <td style="text-align:center;"> 103 (20.9) </td>
+   <td style="text-align:center;"> 104 (25.0) </td>
+   <td style="text-align:center;"> 0.189 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LVESV </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 58.6 (17.8) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 58.4 (17.3) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 59.9 (20.3) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.035 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LV_mass </td>
+   <td style="text-align:center;"> 91.0 (19.5) </td>
+   <td style="text-align:center;"> 91.0 (19.4) </td>
+   <td style="text-align:center;"> 91.6 (19.8) </td>
+   <td style="text-align:center;"> 0.399 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_RV_dysfunction </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 218 (3.58%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 174 (3.34%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 44 (5.07%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.015 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_ischemic_presence: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> No_ischemic_LGE </td>
+   <td style="text-align:center;"> 2491 (41.0%) </td>
+   <td style="text-align:center;"> 2314 (44.4%) </td>
+   <td style="text-align:center;"> 177 (20.4%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Presence_of_ischemic_LGE </td>
+   <td style="text-align:center;"> 3591 (59.0%) </td>
+   <td style="text-align:center;"> 2900 (55.6%) </td>
+   <td style="text-align:center;"> 691 (79.6%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_ischemic_extent_count </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.83 (1.96) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.74 (1.96) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2.37 (1.85) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_ischemic_transmurality: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> A_No_ischemic_LGE </td>
+   <td style="text-align:center;"> 2491 (41.0%) </td>
+   <td style="text-align:center;"> 2314 (44.4%) </td>
+   <td style="text-align:center;"> 177 (20.4%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> B_Subendocardial&lt;50% </td>
+   <td style="text-align:center;"> 1698 (27.9%) </td>
+   <td style="text-align:center;"> 1355 (26.0%) </td>
+   <td style="text-align:center;"> 343 (39.5%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> C_Subendocardial≥50% </td>
+   <td style="text-align:center;"> 1549 (25.5%) </td>
+   <td style="text-align:center;"> 1268 (24.3%) </td>
+   <td style="text-align:center;"> 281 (32.4%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> D_Transmural </td>
+   <td style="text-align:center;"> 344 (5.66%) </td>
+   <td style="text-align:center;"> 277 (5.31%) </td>
+   <td style="text-align:center;"> 67 (7.72%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_ischemic_location_4: </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> A_No_ischemic_LGE </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2491 (41.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2314 (44.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 177 (20.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> B_Neither_anterior_nor_septal </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2662 (43.8%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2136 (41.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 526 (60.6%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> C_Anterior_without_septal </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 422 (6.94%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 351 (6.73%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 71 (8.18%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> D_Septal </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 507 (8.34%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 413 (7.92%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 94 (10.8%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_presence: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> A_No_midwall_LGE </td>
+   <td style="text-align:center;"> 5380 (88.5%) </td>
+   <td style="text-align:center;"> 4581 (87.9%) </td>
+   <td style="text-align:center;"> 799 (92.1%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> B_Presence_of_midwall_LGE </td>
+   <td style="text-align:center;"> 702 (11.5%) </td>
+   <td style="text-align:center;"> 633 (12.1%) </td>
+   <td style="text-align:center;"> 69 (7.95%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_extent_count </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.13 (0.39) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.14 (0.39) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.10 (0.35) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_location_3: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.002 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> No_midwall_LGE </td>
+   <td style="text-align:center;"> 5380 (88.5%) </td>
+   <td style="text-align:center;"> 4581 (87.9%) </td>
+   <td style="text-align:center;"> 799 (92.1%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Midwall_LGE_not_at_risk </td>
+   <td style="text-align:center;"> 471 (7.74%) </td>
+   <td style="text-align:center;"> 426 (8.17%) </td>
+   <td style="text-align:center;"> 45 (5.18%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> At_risk_midwall_LGE_(septal_and/or_lateral) </td>
+   <td style="text-align:center;"> 231 (3.80%) </td>
+   <td style="text-align:center;"> 207 (3.97%) </td>
+   <td style="text-align:center;"> 24 (2.76%) </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_location_4: </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.004 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> No_midwall_LGE </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 5380 (88.5%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 4581 (87.9%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 799 (92.1%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> Midwall_LGE_not_at_risk </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 471 (7.74%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 426 (8.17%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 45 (5.18%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> Lateral_midwall_LGE </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 118 (1.94%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 104 (1.99%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 14 (1.61%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> Septal_Midwall_LGE </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 113 (1.86%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 103 (1.98%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 10 (1.15%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_anterior </td>
+   <td style="text-align:center;"> 140 (2.30%) </td>
+   <td style="text-align:center;"> 132 (2.53%) </td>
+   <td style="text-align:center;"> 8 (0.92%) </td>
+   <td style="text-align:center;"> 0.005 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_septal </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 113 (1.86%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 103 (1.98%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 10 (1.15%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.127 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_inferior </td>
+   <td style="text-align:center;"> 212 (3.49%) </td>
+   <td style="text-align:center;"> 191 (3.66%) </td>
+   <td style="text-align:center;"> 21 (2.42%) </td>
+   <td style="text-align:center;"> 0.080 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_lateral </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 124 (2.04%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 110 (2.11%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 14 (1.61%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.407 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_apical </td>
+   <td style="text-align:center;"> 146 (2.40%) </td>
+   <td style="text-align:center;"> 127 (2.44%) </td>
+   <td style="text-align:center;"> 19 (2.19%) </td>
+   <td style="text-align:center;"> 0.749 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> outcome_revascularisation_90days </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2773 (45.6%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2235 (42.9%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 538 (62.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+export2word(x = Descr_table, 
+            file = here(tables_output_dir, paste0("Tab2-descr-all-center-",Sys.Date(), ".docx")), 
+            which.table="descr", nmax=TRUE, header.labels=c(), 
+            caption=NULL, strip=FALSE, first.strip=FALSE, background="#D2D2D2",
+            size=NULL, header.background=NULL, header.color=NULL)
+```
+
+## Survival
+### Tab3-univ-all-death
+
+```r
+df_selected <- df_all %>%
+  mutate(
+    surv.event = Surv(
+      time = outcome_FU_time_death,
+      event = outcome_death
+    ),
+    CMR_LVEF_5 = CMR_LVEF/5,
+    CMR_LVEDV_5 = CMR_LVEDV/10,
+    CMR_LVESV_5 = CMR_LVESV/10
+  )
+
+model <- coxph(formula = surv.event ~ CMR_LGE_midwall_presence, data = df_selected)
+print("CMR_LGE_midwall_presence univariate analysis for all-cause death")
+```
+
+```
+## [1] "CMR_LGE_midwall_presence univariate analysis for all-cause death"
+```
+
+```r
+extract_model_stats(model, conf_level = 0.95, show.coef = F, decimals = 3)
+```
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source type="application/json">
+{"columns":[{"label":["HR_CI"],"name":[1],"type":["chr"],"align":["left"]},{"label":["p_value"],"name":[2],"type":["chr"],"align":["left"]}],"data":[{"1":"2.848 ( 2.391 - 3.393 )","2":"<0.001"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+
+```r
+Descr_table = createTable(compareGroups(
+  surv.event ~ 
+    demo_age + demo_gender + demo_BMI + CV_risk_diabete + 
+    CV_risk_HTA + CV_risk_obesity + CV_risk_dyslipidemia + CV_risk_Smoking + 
+    
+    history_med_MI  + history_coronary_procedure + history_interv_PCI + 
+    history_interv_CABG + med_periph_atheroma + history_stroke + 
+    med_pacemaker + med_CKD + history_hospit_HF + history_AFib + clini_NYHA + 
+    clini_cardiac_rythm + 
+    
+   outcome_revascularisation_90days +
+    
+    CMR_LVEF_5 + CMR_LVEDV_5 + 
+    CMR_LVESV_5 + CMR_LV_mass + CMR_RV_dysfunction + 
+    
+    CMR_LGE_presence_ischemic_and_midwall +
+    
+    CMR_LGE_ischemic_presence + 
+    CMR_LGE_ischemic_extent_count +
+    CMR_LGE_ischemic_extent_categ +
+    CMR_LGE_ischemic_transmurality +
+    CMR_LGE_ischemic_location_4 +
+    
+    CMR_LGE_ischemic_anterior + 
+    CMR_LGE_ischemic_septal +
+    CMR_LGE_ischemic_inferior +
+    CMR_LGE_ischemic_lateral +
+    CMR_LGE_ischemic_Apical +
+    
+    CMR_LGE_midwall_presence +
+    CMR_LGE_midwall_extent_count + 
+    CMR_LGE_midwall_extent_categ +
+    CMR_LGE_midwall_location_3 + 
+    CMR_LGE_midwall_location_4 +
+    CMR_LGE_midwall_anterior +
+    CMR_LGE_midwall_septal +
+    CMR_LGE_midwall_inferior +
+    CMR_LGE_midwall_lateral +
+    CMR_LGE_midwall_apical,
+  data= df_selected,
+  method = 1, conf.level = 0.95),
+  hide.no = "No",
+  show.ratio =T, show.p.ratio =  T) 
+
+export2md(Descr_table, strip=TRUE, first.strip=TRUE)
+```
+
+<table class="table table-condensed" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>Summary descriptives table by groups of `surv.event'</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:center;"> No event </th>
+   <th style="text-align:center;"> Event </th>
+   <th style="text-align:center;"> HR </th>
+   <th style="text-align:center;"> p.ratio </th>
+   <th style="text-align:center;"> p.overall </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;font-style: italic;border-bottom: 1px solid grey">  </td>
+   <td style="text-align:center;font-style: italic;border-bottom: 1px solid grey"> N=5430 </td>
+   <td style="text-align:center;font-style: italic;border-bottom: 1px solid grey"> N=652 </td>
+   <td style="text-align:center;font-style: italic;border-bottom: 1px solid grey">  </td>
+   <td style="text-align:center;font-style: italic;border-bottom: 1px solid grey">  </td>
+   <td style="text-align:center;font-style: italic;border-bottom: 1px solid grey">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> demo_age </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 64.1 (11.8) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 68.3 (11.3) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.03 [1.02;1.04] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> demo_gender </td>
+   <td style="text-align:center;"> 3843 (70.8%) </td>
+   <td style="text-align:center;"> 576 (88.3%) </td>
+   <td style="text-align:center;"> 2.83 [2.23;3.59] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> demo_BMI </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 27.7 (5.30) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 27.8 (5.57) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.01 [0.99;1.02] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.490 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.490 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV_risk_diabete </td>
+   <td style="text-align:center;"> 1945 (35.8%) </td>
+   <td style="text-align:center;"> 364 (55.8%) </td>
+   <td style="text-align:center;"> 2.09 [1.79;2.44] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CV_risk_HTA </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2817 (51.9%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 327 (50.2%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.92 [0.79;1.07] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.277 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.276 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV_risk_obesity </td>
+   <td style="text-align:center;"> 1509 (27.8%) </td>
+   <td style="text-align:center;"> 178 (27.3%) </td>
+   <td style="text-align:center;"> 0.98 [0.82;1.16] </td>
+   <td style="text-align:center;"> 0.804 </td>
+   <td style="text-align:center;"> 0.805 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CV_risk_dyslipidemia </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2677 (49.3%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 328 (50.3%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.04 [0.89;1.21] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.637 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.634 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV_risk_Smoking </td>
+   <td style="text-align:center;"> 1137 (20.9%) </td>
+   <td style="text-align:center;"> 148 (22.7%) </td>
+   <td style="text-align:center;"> 1.08 [0.90;1.30] </td>
+   <td style="text-align:center;"> 0.401 </td>
+   <td style="text-align:center;"> 0.402 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> history_med_MI </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2090 (38.5%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 264 (40.5%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.08 [0.92;1.26] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.342 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.341 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_coronary_procedure </td>
+   <td style="text-align:center;"> 4817 (88.7%) </td>
+   <td style="text-align:center;"> 577 (88.5%) </td>
+   <td style="text-align:center;"> 0.98 [0.77;1.25] </td>
+   <td style="text-align:center;"> 0.878 </td>
+   <td style="text-align:center;"> 0.879 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> history_interv_PCI </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 310 (5.71%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 70 (10.7%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.74 [1.35;2.24] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_interv_CABG </td>
+   <td style="text-align:center;"> 4566 (84.1%) </td>
+   <td style="text-align:center;"> 519 (79.6%) </td>
+   <td style="text-align:center;"> 0.78 [0.64;0.95] </td>
+   <td style="text-align:center;"> 0.011 </td>
+   <td style="text-align:center;"> 0.011 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> med_periph_atheroma </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 276 (5.08%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 68 (10.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.97 [1.53;2.53] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_stroke </td>
+   <td style="text-align:center;"> 150 (2.76%) </td>
+   <td style="text-align:center;"> 36 (5.52%) </td>
+   <td style="text-align:center;"> 1.92 [1.37;2.69] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> med_pacemaker </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 38 (0.70%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 3 (0.46%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.71 [0.23;2.21] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.556 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.555 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> med_CKD </td>
+   <td style="text-align:center;"> 84 (1.55%) </td>
+   <td style="text-align:center;"> 37 (5.67%) </td>
+   <td style="text-align:center;"> 3.98 [2.86;5.55] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> history_hospit_HF </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 286 (5.27%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 82 (12.6%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2.32 [1.84;2.92] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_AFib </td>
+   <td style="text-align:center;"> 382 (7.03%) </td>
+   <td style="text-align:center;"> 71 (10.9%) </td>
+   <td style="text-align:center;"> 1.60 [1.25;2.05] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> clini_NYHA </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 668 (12.3%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 85 (13.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.02 [0.81;1.28] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.885 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.884 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> clini_cardiac_rythm </td>
+   <td style="text-align:center;"> 368 (6.78%) </td>
+   <td style="text-align:center;"> 58 (8.90%) </td>
+   <td style="text-align:center;"> 1.34 [1.02;1.75] </td>
+   <td style="text-align:center;"> 0.036 </td>
+   <td style="text-align:center;"> 0.034 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> outcome_revascularisation_90days </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2525 (46.5%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 248 (38.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.73 [0.62;0.85] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LVEF_5 </td>
+   <td style="text-align:center;"> 8.79 (1.12) </td>
+   <td style="text-align:center;"> 8.43 (1.28) </td>
+   <td style="text-align:center;"> 0.82 [0.77;0.87] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LVEDV_5 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 10.3 (2.12) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 10.6 (2.40) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.05 [1.02;1.09] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.002 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.002 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LVESV_5 </td>
+   <td style="text-align:center;"> 5.82 (1.75) </td>
+   <td style="text-align:center;"> 6.19 (1.96) </td>
+   <td style="text-align:center;"> 1.09 [1.05;1.13] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LV_mass </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 91.1 (19.5) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 90.9 (19.5) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.00 [1.00;1.00] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.772 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.772 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_RV_dysfunction </td>
+   <td style="text-align:center;"> 153 (2.82%) </td>
+   <td style="text-align:center;"> 65 (9.97%) </td>
+   <td style="text-align:center;"> 3.32 [2.57;4.29] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_presence_ischemic_and_midwall </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 223 (4.11%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 131 (20.1%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 4.44 [3.66;5.38] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_ischemic_presence: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> No_ischemic_LGE </td>
+   <td style="text-align:center;"> 2388 (44.0%) </td>
+   <td style="text-align:center;"> 103 (15.8%) </td>
+   <td style="text-align:center;"> Ref. </td>
+   <td style="text-align:center;"> Ref. </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Presence_of_ischemic_LGE </td>
+   <td style="text-align:center;"> 3042 (56.0%) </td>
+   <td style="text-align:center;"> 549 (84.2%) </td>
+   <td style="text-align:center;"> 3.76 [3.05;4.64] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_ischemic_extent_count </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.53 (1.66) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 4.30 (2.44) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.70 [1.65;1.76] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_ischemic_extent_categ: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> A_No_ischemic_LGE </td>
+   <td style="text-align:center;"> 2388 (44.0%) </td>
+   <td style="text-align:center;"> 103 (15.8%) </td>
+   <td style="text-align:center;"> Ref. </td>
+   <td style="text-align:center;"> Ref. </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> B_1_2_segments </td>
+   <td style="text-align:center;"> 1369 (25.2%) </td>
+   <td style="text-align:center;"> 23 (3.53%) </td>
+   <td style="text-align:center;"> 0.41 [0.26;0.64] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> C_3_5_segments </td>
+   <td style="text-align:center;"> 1659 (30.6%) </td>
+   <td style="text-align:center;"> 294 (45.1%) </td>
+   <td style="text-align:center;"> 3.64 [2.91;4.55] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> D_more6_segments </td>
+   <td style="text-align:center;"> 14 (0.26%) </td>
+   <td style="text-align:center;"> 232 (35.6%) </td>
+   <td style="text-align:center;"> 27.7 [22.0;35.0] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_ischemic_transmurality: </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> A_No_ischemic_LGE </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2388 (44.0%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 103 (15.8%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> Ref. </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> Ref. </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> B_Subendocardial&lt;50% </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1619 (29.8%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 79 (12.1%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.14 [0.85;1.53] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.386 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> C_Subendocardial≥50% </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1290 (23.8%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 259 (39.7%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 4.06 [3.23;5.10] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> D_Transmural </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 133 (2.45%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 211 (32.4%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 16.7 [13.2;21.1] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_ischemic_location_4: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> A_No_ischemic_LGE </td>
+   <td style="text-align:center;"> 2388 (44.0%) </td>
+   <td style="text-align:center;"> 103 (15.8%) </td>
+   <td style="text-align:center;"> Ref. </td>
+   <td style="text-align:center;"> Ref. </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> B_Neither_anterior_nor_septal </td>
+   <td style="text-align:center;"> 2563 (47.2%) </td>
+   <td style="text-align:center;"> 99 (15.2%) </td>
+   <td style="text-align:center;"> 0.89 [0.67;1.17] </td>
+   <td style="text-align:center;"> 0.395 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> C_Anterior_without_septal </td>
+   <td style="text-align:center;"> 317 (5.84%) </td>
+   <td style="text-align:center;"> 105 (16.1%) </td>
+   <td style="text-align:center;"> 6.40 [4.88;8.40] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> D_Septal </td>
+   <td style="text-align:center;"> 162 (2.98%) </td>
+   <td style="text-align:center;"> 345 (52.9%) </td>
+   <td style="text-align:center;"> 19.4 [15.5;24.1] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_ischemic_anterior </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 384 (7.07%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 402 (61.7%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 12.4 [10.6;14.5] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_ischemic_septal </td>
+   <td style="text-align:center;"> 162 (2.98%) </td>
+   <td style="text-align:center;"> 345 (52.9%) </td>
+   <td style="text-align:center;"> 14.6 [12.5;17.0] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_ischemic_inferior </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1097 (20.2%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 117 (17.9%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.88 [0.72;1.08] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.218 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.216 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_ischemic_lateral </td>
+   <td style="text-align:center;"> 966 (17.8%) </td>
+   <td style="text-align:center;"> 229 (35.1%) </td>
+   <td style="text-align:center;"> 2.20 [1.87;2.59] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_ischemic_Apical </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 875 (16.1%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 293 (44.9%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 3.54 [3.03;4.13] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_presence: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> A_No_midwall_LGE </td>
+   <td style="text-align:center;"> 4901 (90.3%) </td>
+   <td style="text-align:center;"> 479 (73.5%) </td>
+   <td style="text-align:center;"> Ref. </td>
+   <td style="text-align:center;"> Ref. </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> B_Presence_of_midwall_LGE </td>
+   <td style="text-align:center;"> 529 (9.74%) </td>
+   <td style="text-align:center;"> 173 (26.5%) </td>
+   <td style="text-align:center;"> 2.85 [2.39;3.39] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_extent_count </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.10 (0.31) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.39 (0.71) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2.63 [2.35;2.95] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_extent_categ: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> None </td>
+   <td style="text-align:center;"> 4901 (90.3%) </td>
+   <td style="text-align:center;"> 479 (73.5%) </td>
+   <td style="text-align:center;"> Ref. </td>
+   <td style="text-align:center;"> Ref. </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Low_=1 </td>
+   <td style="text-align:center;"> 510 (9.39%) </td>
+   <td style="text-align:center;"> 100 (15.3%) </td>
+   <td style="text-align:center;"> 1.88 [1.52;2.33] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> High_&gt;1 </td>
+   <td style="text-align:center;"> 19 (0.35%) </td>
+   <td style="text-align:center;"> 73 (11.2%) </td>
+   <td style="text-align:center;"> 10.3 [8.03;13.2] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_location_3: </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> No_midwall_LGE </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 4901 (90.3%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 479 (73.5%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> Ref. </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> Ref. </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> Midwall_LGE_not_at_risk </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 406 (7.48%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 65 (9.97%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.53 [1.18;1.98] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;background-color: rgba(210, 210, 210, 255) !important;" indentlevel="1"> At_risk_midwall_LGE_(septal_and/or_lateral) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 123 (2.27%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 108 (16.6%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 5.94 [4.81;7.32] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_location_4: </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;">  </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> No_midwall_LGE </td>
+   <td style="text-align:center;"> 4901 (90.3%) </td>
+   <td style="text-align:center;"> 479 (73.5%) </td>
+   <td style="text-align:center;"> Ref. </td>
+   <td style="text-align:center;"> Ref. </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Midwall_LGE_not_at_risk </td>
+   <td style="text-align:center;"> 406 (7.48%) </td>
+   <td style="text-align:center;"> 65 (9.97%) </td>
+   <td style="text-align:center;"> 1.53 [1.18;1.98] </td>
+   <td style="text-align:center;"> 0.001 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Lateral_midwall_LGE </td>
+   <td style="text-align:center;"> 64 (1.18%) </td>
+   <td style="text-align:center;"> 54 (8.28%) </td>
+   <td style="text-align:center;"> 6.03 [4.55;7.99] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> Septal_Midwall_LGE </td>
+   <td style="text-align:center;"> 59 (1.09%) </td>
+   <td style="text-align:center;"> 54 (8.28%) </td>
+   <td style="text-align:center;"> 5.84 [4.40;7.77] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;">  </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_anterior </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 113 (2.08%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 27 (4.14%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 1.62 [1.10;2.39] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.015 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.012 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_septal </td>
+   <td style="text-align:center;"> 59 (1.09%) </td>
+   <td style="text-align:center;"> 54 (8.28%) </td>
+   <td style="text-align:center;"> 5.16 [3.90;6.85] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_inferior </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 166 (3.06%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 46 (7.06%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 2.46 [1.82;3.32] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_lateral </td>
+   <td style="text-align:center;"> 64 (1.18%) </td>
+   <td style="text-align:center;"> 60 (9.20%) </td>
+   <td style="text-align:center;"> 5.75 [4.41;7.50] </td>
+   <td style="text-align:center;"> &lt;0.001 </td>
+   <td style="text-align:center;"> 0.000 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;background-color: rgba(210, 210, 210, 255) !important;"> CMR_LGE_midwall_apical </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 132 (2.43%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 14 (2.15%) </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.79 [0.46;1.34] </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.382 </td>
+   <td style="text-align:center;background-color: rgba(210, 210, 210, 255) !important;"> 0.370 </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+export2word(x = Descr_table, 
+            file = here(tables_output_dir, paste0("Tab4-univ-all-death-",Sys.Date(), ".docx")), 
+            which.table="descr", nmax=TRUE, header.labels=c(), 
+            caption=NULL, strip=FALSE, first.strip=FALSE, background="#D2D2D2",
+            size=NULL, header.background=NULL, header.color=NULL)
+```
