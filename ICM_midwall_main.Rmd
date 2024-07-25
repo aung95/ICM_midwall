@@ -33,6 +33,7 @@ date_suffix <- format(Sys.Date(), "%Y-%m-%d")
 figures_html_dir <- here::here("outputs", "figure_html", paste0("Fig_html-", date_suffix))
 tables_date_dir <- here::here("outputs", "tables", paste0("Tab-", date_suffix))
 figures_date_dir <- here::here("outputs", "figures", paste0("Fig-", date_suffix))
+csv_date_dir <- here::here("outputs", "csv", paste0("CSV-", date_suffix))
 
 # Check if the directory exists, if not, create it
 if (!dir.exists(figures_html_dir)) {
@@ -58,9 +59,18 @@ if (!dir.exists(figures_date_dir)) {
   message("Directory already exists: ", figures_date_dir)
 }
 
+# Check and create the "csv" date-specific directory if it doesn't exist
+if (!dir.exists(csv_date_dir)) {
+  dir.create(csv_date_dir, recursive = TRUE)
+  message("Directory created: ", csv_date_dir)
+} else {
+  message("Directory already exists: ", csv_date_dir)
+}
+
 # Save the directory paths for later use in the script
 tables_output_dir <- tables_date_dir
 figures_output_dir <- figures_date_dir
+csv_output_dir <- csv_date_dir
 
 # Set knitr options with the absolute path
 opts_chunk$set(
@@ -77,6 +87,7 @@ print(paste("Working Directory:", getwd()))
 print(paste("Figure HTML Directory:", figures_html_dir))
 print(paste("Tables Directory:", tables_output_dir))
 print(paste("Figures Directory:", figures_output_dir))
+print(paste("CSV Directory:", csv_output_dir))
 ```
 # Package installation
 ```{r Packages}
@@ -94,6 +105,7 @@ library(DataExplorer)         # Exploratory data analysis
 library(compareGroups)        # Comparing groups
 library(psych)                # Psychological statistics and data manipulation
 library(Hmisc)                # Miscellaneous functions for data analysis
+library(purrr)
 
 # ---- Survival analysis
 library(poptrend)             # Calculating p-trend in survival analysis
@@ -143,6 +155,7 @@ load(file = here("data","df_LGE.RData"))
 ```
 
 # All population (N=6,081)
+
 ## Descriptive
 ### Tab1-descr-all-LGE_midwall_presence
 ```{r Tab1-descr-all-LGE_midwall_presence}
@@ -192,7 +205,6 @@ export2word(x = Descr_table,
             caption=NULL, strip=FALSE, first.strip=FALSE, background="#D2D2D2",
             size=NULL, header.background=NULL, header.color=NULL)
 ```
-
 ## Details of comparison {.tabset}
 ### LVEF
 ```{r figures_LVEF_comp}
@@ -226,7 +238,6 @@ ggplot(combined_data_LVEF, aes(x = CMR_LVEF, color = Group, fill = Group)) +
   annotate("text", x = -Inf, y = Inf, label = paste0("Wilcoxon p-value: ", round(wilcox_test_LVEF$p.value, 3)), hjust = -0.1, vjust = 3, size = 5, color = "black")
 
 ```
-
 ### LVEDV
 ```{r figures_LVED_comp}
 # Parametric test (t-test)
@@ -259,7 +270,6 @@ ggplot(combined_data_LVEDV, aes(x = CMR_LVEDV, color = Group, fill = Group)) +
   annotate("text", x = -Inf, y = Inf, label = paste0("Wilcoxon p-value: ", round(wilcox_test_LVEDV$p.value, 3)), hjust = -0.1, vjust = 3, size = 5, color = "black")
 
 ```
-
 ### Tab2-descr-all-center
 ```{r Tab2-descr-all-center}
 Descr_table = createTable(compareGroups(
@@ -371,7 +381,7 @@ Descr_table = createTable(compareGroups(
 export2md(Descr_table, strip=TRUE, first.strip=TRUE)
 
 export2word(x = Descr_table, 
-            file = here(tables_output_dir, paste0("Tab4-univ-all-death-",Sys.Date(), ".docx")), 
+            file = here(tables_output_dir, paste0("Tab3-univ-all-death-",Sys.Date(), ".docx")), 
             which.table="descr", nmax=TRUE, header.labels=c(), 
             caption=NULL, strip=FALSE, first.strip=FALSE, background="#D2D2D2",
             size=NULL, header.background=NULL, header.color=NULL)
@@ -379,3 +389,404 @@ export2word(x = Descr_table,
 
 
 ```
+### Tab4-multi-all-death
+```{r Tab4-multi-all-death}
+df <- df_all %>% mutate(
+  event = outcome_death,
+  time = outcome_FU_time_death,
+  CMR_LVEF_5 = CMR_LVEF/5
+) %>% select(
+  event, time,
+  demo_age, demo_gender, demo_BMI , CV_risk_diabete , CV_risk_Smoking , CV_risk_HTA,  CV_risk_Smoking, CV_risk_dyslipidemia ,  history_hospit_HF, history_AFib, med_CKD, history_med_MI , CMR_LVEF_5, CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_presence, CMR_LGE_midwall_location_3, CMR_LGE_midwall_extent_count, outcome_revascularisation_90days) %>% droplevels()
+
+# Define models
+models <- list(
+  model1 = coxph(Surv(time, event) ~ ., data = df %>% select(event:CMR_LVEF_5)),
+  model2 = coxph(Surv(time, event) ~ ., data = df %>% select(event:CMR_LGE_ischemic_extent_count)),
+  model3A = coxph(Surv(time, event) ~ ., data = df %>% select(event:CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_presence)),
+  model3B = coxph(Surv(time, event) ~ ., data = df %>% select(event:CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_location_3)),
+  model3C = coxph(Surv(time, event) ~ ., data = df %>% select(event:CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_extent_count))
+)
+
+# Extract model statistics and combine
+model_stats <- lapply(models, extract_model_stats) # adaptation possible to have more decimals
+
+# Rename the columns in each dataframe to include the model name
+model_stats_named <- lapply(names(model_stats), function(model_name) {
+  data <- model_stats[[model_name]]
+  # Ensure row names are in a column (if not already)
+  if (!"A_Variable" %in% colnames(data)) {
+    data$A_Variable <- rownames(data)
+  }
+  # Rename other columns to include the model name for uniqueness
+  colnames(data)[-which(colnames(data) == "A_Variable")] <- paste(colnames(data)[-which(colnames(data) == "A_Variable")], model_name, sep = "_")
+  return(data)
+})
+
+# Combine all models using full_join, join by 'Variable'
+combined_models <- purrr::reduce(model_stats_named, full_join, by = "A_Variable")
+
+# Set 'Variable' as rownames and remove 'Variable' from the dataframe columns
+rownames(combined_models) <- combined_models$A_Variable
+combined_models$A_Variable <- NULL
+
+
+# export in html
+knitr::kable(combined_models, caption = "Models multi- all pop (N=6,082)", format = "html") %>%
+  kableExtra::kable_styling(full_width = F, bootstrap_options = c("striped", "hover", "condensed", "bordered"))
+
+combined_models$A_Variable <- rownames(combined_models)
+
+# Make A_Variable the first column
+combined_models <- combined_models %>%
+  select(A_Variable, everything())
+
+# Export in word
+ft <- flextable(combined_models)
+ft <- set_table_properties(ft, layout = "autofit")
+doc <- read_docx() %>%
+  body_add_par("Model full - all pop (N=6,082)", style = "heading 1") %>%
+  body_add_flextable(ft)
+
+print(doc, target = here(tables_output_dir,paste0("Tab4-multi-all-death-",Sys.Date(), ".docx")))
+```
+### Tab5-incr-all-death 
+function could be improved (probably since there is bootstrapping etc, the ideal would be to save somewhere the results and to recalculate only if parameters changes). For the future me. 
+"Supplementary Figure 3. Incremental prognostic value of the presence of midwall-LGE in the overall population (N=6,082)"
+```{r Tab5-incr-all-death}
+var_base = c("demo_age", "demo_gender" , "demo_BMI" , "CV_risk_diabete" , "CV_risk_HTA", "CV_risk_Smoking" , "CV_risk_dyslipidemia" ,  "history_hospit_HF", "history_AFib" , "med_CKD" , "history_med_MI" , "CMR_LVEF")
+var_added = c("CMR_LGE_ischemic_extent_count",
+    "CMR_LGE_midwall_presence")
+
+D <- incremental_function(
+  df = df_all,
+  event = "outcome_death",
+  time = "outcome_FU_time_death",
+  time_analyzed = 12, # median(df_all$outcome_FU_time_death/12), # big debate on which value to use (use in NRI and IDI)
+  var_1 = var_base,
+  var_2 = c(var_base,c("CMR_LGE_ischemic_extent_count")),
+  var_3 = c(var_base,c("CMR_LGE_ischemic_extent_count",
+    "CMR_LGE_midwall_presence")))
+
+D
+```
+
+## Figures
+### Fig1-all-KM-LGE_midwall_presence
+" Panel A central figure"
+```{r Fig1-all-KM-LGE_midwall_presence}
+# Data parameters
+results <- createSurvivalPlot(
+  data = df_all,
+  compared_with = "CMR_LGE_midwall_presence",
+  time = "outcome_FU_time_death",
+  event = "outcome_death",
+  my_colors = c("#25A26B","#FF002B"),
+  confint_choosen = 0.95,
+  mytitle = "Fig1: LGE presence (all pop = 6,082)"
+)
+
+results$HR
+results$ggsurv
+
+# Save the plot in a folder 
+ggsave(
+  filename = here(figures_output_dir, paste0("Fig1-all-KM-Midwall_presence_plot-", Sys.Date(),".png")),
+  plot = results$ggsurv$plot, width = 10, height = 6, units = "in", dpi = 600)
+ggsave(
+  filename = here(figures_output_dir,paste0("Fig1-all-KM-Midwall_presence_presence_risk-", Sys.Date(),".png")),
+  plot = results$ggsurv$table, width = 10, height = 3, units = "in", dpi = 600)
+```
+### Fig2-all-KM-LGE_type
+" Suppl figure S2"
+```{r Fig2-all-KM-LGE_type}
+# Data parameters
+results <- createSurvivalPlot(
+  data = df_all,
+  compared_with = "CMR_LGE_type",
+  time = "outcome_FU_time_death",
+  event = "outcome_death",
+  my_colors = c("#25A26B","#4292C6","#FF002B","#2C3E50"),
+  confint_choosen = 0.95,
+  mytitle = "Fig2: LGE type (all pop = 6,082)"
+)
+
+results$HR
+results$ggsurv
+
+# Save the plot in a folder 
+ggsave(
+  filename = here(figures_output_dir, paste0("Fig2-all-KM-LGE_type_plot-", Sys.Date(),".png")),
+  plot = results$ggsurv$plot, width = 10, height = 6, units = "in", dpi = 600)
+ggsave(
+  filename = here(figures_output_dir,paste0("Fig2-all-KM-LGE_type_risk-", Sys.Date(),".png")),
+  plot = results$ggsurv$table, width = 10, height = 3, units = "in", dpi = 600)
+```
+### Fig3-all-death_rate_pattern
+```{r Fig3-all-death_rate_pattern}
+### BY EXTENT 
+# Data
+df_selected <- df_all %>%
+  mutate(
+    outcome = outcome_death,
+    outcome_FU_time_death = outcome_FU_time_death,
+    variable_to_group = CMR_LGE_ischemic_extent_categ,
+    variable_of_interest = CMR_LGE_midwall_presence
+  )
+
+# Parameters # Set the title for the graph
+mytitle <- c("Ischemic LGE extent by midwall - all (N=6082)")
+my_colors <- c("#25A26B","#FF002B")
+confint_choosen = 0.95 
+
+# ANNUALISE /  py à faire en jour !
+py1 <- pyears(Surv(outcome_FU_time_death*(365/12), outcome_death) ~ variable_to_group, data = df_selected, subset = df_selected$variable_of_interest == "A_No_midwall_LGE", data.frame = T) # change here for the categories you want to divide
+df1 <- py1$data
+df1$MidW <- c(rep("A_No_midwall_LGE",4))
+df1$annual_rates <- round(100*(df1$event/df1$pyears), 2) # give pourcentage 
+
+py2 <- pyears(Surv(outcome_FU_time_death*(365/12), outcome_death) ~ variable_to_group, data = df_selected, subset = df_selected$variable_of_interest == "B_Presence_of_midwall_LGE", data.frame = T)
+df2 <- py2$data
+df2$annual_rates <-  round(100*(df2$event/df2$pyears), 2) # give pourcentage 
+df2$MidW <- c(rep("B_Presence_of_midwall_LGE",4))
+
+df_add <- rbind(df1, df2) # fused two df
+
+
+# The graph
+gg_graph <- ggplot(data = df_add,
+       aes(x = variable_to_group, y = annual_rates, fill = MidW, label = annual_rates)) + 
+  geom_bar(position="dodge", stat='identity')+ 
+  scale_fill_manual(values = adjustcolor(my_colors, alpha.f = 0.8)) +
+  labs(
+  x = "LGE Extent (in categories of segments)",
+  y = "Annualized event rate (%)",
+  fill = "Presence of Midwall" )+
+  ggtitle(mytitle)+
+  geom_text(
+    aes(x = variable_to_group, y = annual_rates, label = annual_rates, group = MidW),
+    position = position_dodge(width = 1),
+    vjust = -0.5, size = 4, fontface = "bold") +
+  scale_y_continuous(expand = c(0, 1), limits = c(0,15), breaks = seq(0, 17.5, 2.5)) + # Here to change the size of graphics
+  theme_bw()+
+  theme(
+    panel.grid.major = element_line(color = "gray", size = 0.2, linetype = "dotted"),
+    panel.grid.minor = element_line(color = "gray", size = 0.2, linetype = "dotted"),
+    plot.title = element_text(hjust = 0.5),
+    axis.title.x = element_blank(),
+    # axis.text.x = element_blank(), to remove the x axis legend
+    axis.line.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_text(size = 12, face = "bold"),
+    panel.border = element_blank(),
+    legend.position = c(0.1, 0.9),  # Move the legend to the top-left corner
+    legend.justification = c(0, 1),  # Anchor the legend to the top-left corner
+    legend.text = element_text(size = 12),  # Adjust the legend text size
+    legend.title = element_text(size = 14)  # Adjust the legend title size
+  )
+
+gg_graph
+
+ggsave(
+  filename = here(figures_output_dir, paste0("Fig3a-all-death_rate_extent-", Sys.Date(),".png")),
+    plot = gg_graph, width = 6, height = 6, units = "in", dpi = 600)
+
+# Compare subgroups
+print(df_add) # u see the dataframe used to build the graph
+n_values <- c(1, 2, 3, 4) # now i want to compare by 2 therefore i use this method
+for (n in n_values) {
+  rate_comp <- ratedifference(df_add$event[n + 4], df_add$event[n], df_add$pyears[n + 4], df_add$pyears[n], CRC = TRUE, conf.level = 0.95)
+  value <- as.character(rate_comp$p.value)
+  result <- ifelse(rate_comp$p.value < 0.001 | rate_comp$p.value == 0, "<0.001", value)
+  print(result)
+}
+
+
+####### BY PATTERN
+# Data
+df_selected <- df_all %>%
+  mutate(
+    outcome = outcome_death,
+    outcome_FU_time_death = outcome_FU_time_death,
+    variable_to_group = CMR_LGE_ischemic_transmurality,
+    variable_of_interest = CMR_LGE_midwall_presence
+  )
+
+# Parameters # Set the title for the graph
+mytitle <- c("Ischemic LGE pattern by midwall - all (N=6082)")
+my_colors <- c("#25A26B","#FF002B")
+confint_choosen = 0.95 
+
+
+# ANNUALISE /  py à faire en jour !
+py1 <- pyears(Surv(outcome_FU_time_death*(365/12), outcome_death) ~ variable_to_group, data = df_selected, subset = df_selected$variable_of_interest == "A_No_midwall_LGE", data.frame = T) # change here for the categories you want to divide
+df1 <- py1$data
+df1$MidW <- c(rep("A_No_midwall_LGE",4))
+df1$annual_rates <- round(100*(df1$event/df1$pyears), 2) # give pourcentage 
+
+py2 <- pyears(Surv(outcome_FU_time_death*(365/12), outcome_death) ~ variable_to_group, data = df_selected, subset = df_selected$variable_of_interest == "B_Presence_of_midwall_LGE", data.frame = T)
+df2 <- py2$data
+df2$annual_rates <-  round(100*(df2$event/df2$pyears), 2) # give pourcentage 
+df2$MidW <- c(rep("B_Presence_of_midwall_LGE",4))
+
+df_add <- rbind(df1, df2) # fused two df
+
+
+# The graph
+gg_graph <- ggplot(data = df_add,
+       aes(x = variable_to_group, y = annual_rates, fill = MidW, label = annual_rates)) + 
+  geom_bar(position="dodge", stat='identity')+ 
+  scale_fill_manual(values = adjustcolor(my_colors, alpha.f = 0.8)) +
+  labs(
+  x = "LGE Extent (in categories of segments)",
+  y = "Annualized event rate (%)",
+  fill = "Presence of Midwall" )+
+  ggtitle(mytitle)+
+  geom_text(
+    aes(x = variable_to_group, y = annual_rates, label = annual_rates, group = MidW),
+    position = position_dodge(width = 1),
+    vjust = -0.5, size = 4, fontface = "bold") +
+  scale_y_continuous(expand = c(0, 1), limits = c(0,15), breaks = seq(0, 17.5, 2.5)) + # Here to change the size of graphics
+  theme_bw()+
+  theme(
+    panel.grid.major = element_line(color = "gray", size = 0.2, linetype = "dotted"),
+    panel.grid.minor = element_line(color = "gray", size = 0.2, linetype = "dotted"),
+    plot.title = element_text(hjust = 0.5),
+    axis.title.x = element_blank(),
+    # axis.text.x = element_blank(), to remove the x axis legend
+    axis.line.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.text.y = element_text(size = 12, face = "bold"),
+    panel.border = element_blank(),
+    legend.position = c(0.1, 0.9),  # Move the legend to the top-left corner
+    legend.justification = c(0, 1),  # Anchor the legend to the top-left corner
+    legend.text = element_text(size = 12),  # Adjust the legend text size
+    legend.title = element_text(size = 14)  # Adjust the legend title size
+  )
+
+gg_graph
+
+ggsave(
+  filename = here(figures_output_dir, paste0("Fig3b-all-death_rate_transmurality-", Sys.Date(),".png")),
+    plot = gg_graph, width = 6, height = 6, units = "in", dpi = 600)
+
+# Compare subgroups
+print(df_add) # u see the dataframe used to build the graph
+n_values <- c(1, 2, 3, 4) # now i want to compare by 2 therefore i use this method
+for (n in n_values) {
+  rate_comp <- ratedifference(df_add$event[n + 4], df_add$event[n], df_add$pyears[n + 4], df_add$pyears[n], CRC = TRUE, conf.level = 0.95)
+  value <- as.character(rate_comp$p.value)
+  result <- ifelse(rate_comp$p.value < 0.001 | rate_comp$p.value == 0, "<0.001", value)
+  print(result)
+}
+```
+### Fig4-all-KM-LGE_HTA
+" Suppl figure S3"
+```{r Fig4-all-KM-LGE_HTA}
+# Data parameters
+df <- df_all %>%
+  mutate(
+    HTA_LGE = case_when(
+      CMR_LGE_midwall_presence == "A_No_midwall_LGE" & CV_risk_HTA == "Yes" ~ "A LGE MW - ; HTA +",
+      CMR_LGE_midwall_presence == "A_No_midwall_LGE" & CV_risk_HTA == "No" ~ "B LGE MW - ; HTA -",
+      CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE" & CV_risk_HTA == "Yes" ~ "C LGE MW + ; HTA +",
+      CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE" & CV_risk_HTA == "No" ~ "D LGE MW + ; HTA -",
+      TRUE ~ NA_character_
+    )
+  )
+
+results <- createSurvivalPlot(
+  data = df,
+  compared_with = "HTA_LGE",
+  time = "outcome_FU_time_death",
+  event = "outcome_death",
+  my_colors = c("#25A26B","orange4","#FF002B","#2C3E50"),
+  confint_choosen = 0.95,
+  mytitle = "Fig4: LGE x HTA (all pop = 6,082)"
+)
+
+results$HR
+results$ggsurv
+
+# Save the plot in a folder 
+ggsave(
+  filename = here(figures_output_dir, paste0("Fig4-all-KM-LGE_HTA-plot-", Sys.Date(),".png")),
+  plot = results$ggsurv$plot, width = 10, height = 6, units = "in", dpi = 600)
+ggsave(
+  filename = here(figures_output_dir,paste0("Fig4-all-KM-LGE_HTA-plot", Sys.Date(),".png")),
+  plot = results$ggsurv$table, width = 10, height = 3, units = "in", dpi = 600)
+```
+### Fig5-ForestPlot
+```{r Fig5-ForestPlot}
+library(forestplot)
+# function
+df_selected <- df_all %>%
+  mutate(
+    demo_age_categ = factor(case_when(
+      demo_age < 65 ~ "age<65",
+      TRUE ~ "age≥65"
+    ), levels = c("age<65", "age≥65")),
+    CMR_LVEF_categ = factor(ifelse(
+      CMR_LVEF <= 40, "HFrEF", "HFmrEF"
+    ), levels = c("HFrEF", "HFmrEF"))
+  )
+
+print("Forest plot")
+
+D <- forest_function(
+  df = df_selected, 
+  time_var = "outcome_FU_time_death",
+  event_var = "outcome_death",
+  var_of_interest = "CMR_LGE_midwall_presence",
+  "demo_age_categ",
+  "demo_gender",
+  "CV_risk_obesity",
+  "CV_risk_diabete",
+  "CV_risk_HTA",
+  "CV_risk_Smoking",
+  "clini_NYHA",
+  "CMR_LVEF_categ"
+)
+
+base_data <- D
+
+name_row_vector <- c("Age","<65 years", "≥65 years", "Gender","Female", "Male", "Body Mass Index ","No obesity", "Obesity", "Diabete mellitus", "No", "Yes", "Hypertension", "No", "Yes", "Smoking", "No", "Yes", "Symptoms", "Asymptomatic","Symptomatic", "LVEF","≤40%", ">40%")
+
+base_data$name <- name_row_vector
+
+# png(here(figures_output_dir,paste0("Fig5-forestplot", Sys.Date(),".png")), width = 10, height = 5, dpi = 300)
+
+# Generate the forestplot
+forest_plot <- base_data |>
+  forestplot(
+    labeltext = c(name, ratio1, ratio2, OR, Pval, PValInter), 
+    graph.pos = 4,
+    mean = mean,
+    upper = upper,
+    lower = lower,
+    is.summary = FALSE, # c(rep(TRUE, 2), rep(c(TRUE, FALSE, FALSE), 8)), #Make Text Bold to highlight Summary rows
+    boxsize = 0.2,  # Adjust the boxsize as needed) 
+    clip = c(0, 7),  #Lower and upper limits for clipping confidence intervals to arrows
+    align = c("r", "c", "c", "r","l", "l"), # make it work 
+    vertices = TRUE,
+    
+    xlog = FALSE,  #Log scale on X axis 
+    
+    col = fpColors(box = "royalblue",
+                    line = "darkblue",
+                    summary = "royalblue")) |>
+
+  fp_set_zebra_style("#EFEFEF", ignore_subheaders = FALSE)|>
+
+  fp_set_style(box = "red",
+               line = "gray0",
+               summary = "royalblue",
+               align = "lrrr")
+
+print(forest_plot)
+
+# dev.off()
+
+```
+
+# Midwall population (N=702)

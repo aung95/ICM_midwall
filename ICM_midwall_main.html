@@ -3181,43 +3181,44 @@ installation</h1>
 <span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="fu">library</span>(compareGroups)        <span class="co"># Comparing groups</span></span>
 <span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="fu">library</span>(psych)                <span class="co"># Psychological statistics and data manipulation</span></span>
 <span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a><span class="fu">library</span>(Hmisc)                <span class="co"># Miscellaneous functions for data analysis</span></span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a><span class="co"># ---- Survival analysis</span></span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="fu">library</span>(poptrend)             <span class="co"># Calculating p-trend in survival analysis</span></span>
-<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="fu">library</span>(survival)             <span class="co"># Survival analysis</span></span>
-<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="fu">library</span>(survivalAnalysis)     <span class="co"># Survival analysis functions</span></span>
-<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="fu">library</span>(survminer)            <span class="co"># Drawing survival curves</span></span>
-<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="fu">library</span>(adjustedCurves)       <span class="co"># Plotting adjusted survival curves</span></span>
-<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="fu">library</span>(pammtools)            <span class="co"># Plotting adjusted survival curves</span></span>
-<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="fu">library</span>(survIDINRI)           <span class="co"># Make reclassification and discrimination </span></span>
-<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="fu">library</span>(glmnet)               <span class="co"># Regularized regression models</span></span>
-<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="fu">library</span>(olsrr)                <span class="co"># Variable selection at its best !</span></span>
-<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="fu">library</span>(StepReg)                <span class="co"># Variable selection at its best !</span></span>
-<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a><span class="co"># ---- Graphics</span></span>
-<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="fu">library</span>(ggplot2)              <span class="co"># Data visualization</span></span>
-<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="fu">library</span>(mctest)               <span class="co"># Multiple hypothesis testing --&gt; assess colinearity between continuous variable</span></span>
-<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="fu">library</span>(corrplot)             <span class="co"># Visualizing correlation matrices</span></span>
-<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a><span class="fu">library</span>(fmsb)                 <span class="co"># Creating radar plots</span></span>
-<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a><span class="fu">library</span>(concreg)              <span class="co"># Plotting adjusted survival curves</span></span>
-<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a><span class="fu">library</span>(ggpubr)               <span class="co"># Associating the risk table when plotting</span></span>
-<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a><span class="co"># ---- Survival analysis</span></span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a><span class="fu">library</span>(poptrend)             <span class="co"># Calculating p-trend in survival analysis</span></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a><span class="fu">library</span>(survival)             <span class="co"># Survival analysis</span></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="fu">library</span>(survivalAnalysis)     <span class="co"># Survival analysis functions</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a><span class="fu">library</span>(survminer)            <span class="co"># Drawing survival curves</span></span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a><span class="fu">library</span>(adjustedCurves)       <span class="co"># Plotting adjusted survival curves</span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="fu">library</span>(pammtools)            <span class="co"># Plotting adjusted survival curves</span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a><span class="fu">library</span>(survIDINRI)           <span class="co"># Make reclassification and discrimination </span></span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a><span class="fu">library</span>(glmnet)               <span class="co"># Regularized regression models</span></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a><span class="fu">library</span>(olsrr)                <span class="co"># Variable selection at its best !</span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a><span class="fu">library</span>(StepReg)                <span class="co"># Variable selection at its best !</span></span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a><span class="co"># ---- Graphics</span></span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a><span class="fu">library</span>(ggplot2)              <span class="co"># Data visualization</span></span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a><span class="fu">library</span>(mctest)               <span class="co"># Multiple hypothesis testing --&gt; assess colinearity between continuous variable</span></span>
+<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a><span class="fu">library</span>(corrplot)             <span class="co"># Visualizing correlation matrices</span></span>
+<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a><span class="fu">library</span>(fmsb)                 <span class="co"># Creating radar plots</span></span>
+<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a><span class="fu">library</span>(concreg)              <span class="co"># Plotting adjusted survival curves</span></span>
+<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a><span class="fu">library</span>(ggpubr)               <span class="co"># Associating the risk table when plotting</span></span>
 <span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a></span>
-<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a><span class="co"># My packages</span></span>
-<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a><span class="co"># Function to source all R files in a specified directory</span></span>
-<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a>source_all <span class="ot">&lt;-</span> <span class="cf">function</span>(directory_path) {</span>
-<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a>  <span class="co"># Obtain a list of R script files in the directory</span></span>
-<span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a>  r_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(directory_path, <span class="at">pattern =</span> <span class="st">&quot;</span><span class="sc">\\</span><span class="st">.R$&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-42"><a href="#cb1-42" tabindex="-1"></a>  </span>
-<span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a>  <span class="co"># Source each file</span></span>
-<span id="cb1-44"><a href="#cb1-44" tabindex="-1"></a>  <span class="cf">for</span> (file <span class="cf">in</span> r_files) {</span>
-<span id="cb1-45"><a href="#cb1-45" tabindex="-1"></a>    <span class="fu">source</span>(file)</span>
-<span id="cb1-46"><a href="#cb1-46" tabindex="-1"></a>  }</span>
-<span id="cb1-47"><a href="#cb1-47" tabindex="-1"></a>}</span>
-<span id="cb1-48"><a href="#cb1-48" tabindex="-1"></a></span>
-<span id="cb1-49"><a href="#cb1-49" tabindex="-1"></a><span class="co"># Usage example:</span></span>
-<span id="cb1-50"><a href="#cb1-50" tabindex="-1"></a><span class="co"># Assuming your scripts are stored in the &#39;Functions&#39; directory within your project</span></span>
-<span id="cb1-51"><a href="#cb1-51" tabindex="-1"></a><span class="fu">source_all</span>(<span class="fu">here</span>(<span class="st">&quot;Functions_R&quot;</span>))</span></code></pre></div>
+<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a><span class="co"># My packages</span></span>
+<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a><span class="co"># Function to source all R files in a specified directory</span></span>
+<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a>source_all <span class="ot">&lt;-</span> <span class="cf">function</span>(directory_path) {</span>
+<span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a>  <span class="co"># Obtain a list of R script files in the directory</span></span>
+<span id="cb1-42"><a href="#cb1-42" tabindex="-1"></a>  r_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(directory_path, <span class="at">pattern =</span> <span class="st">&quot;</span><span class="sc">\\</span><span class="st">.R$&quot;</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a>  </span>
+<span id="cb1-44"><a href="#cb1-44" tabindex="-1"></a>  <span class="co"># Source each file</span></span>
+<span id="cb1-45"><a href="#cb1-45" tabindex="-1"></a>  <span class="cf">for</span> (file <span class="cf">in</span> r_files) {</span>
+<span id="cb1-46"><a href="#cb1-46" tabindex="-1"></a>    <span class="fu">source</span>(file)</span>
+<span id="cb1-47"><a href="#cb1-47" tabindex="-1"></a>  }</span>
+<span id="cb1-48"><a href="#cb1-48" tabindex="-1"></a>}</span>
+<span id="cb1-49"><a href="#cb1-49" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" tabindex="-1"></a><span class="co"># Usage example:</span></span>
+<span id="cb1-51"><a href="#cb1-51" tabindex="-1"></a><span class="co"># Assuming your scripts are stored in the &#39;Functions&#39; directory within your project</span></span>
+<span id="cb1-52"><a href="#cb1-52" tabindex="-1"></a><span class="fu">source_all</span>(<span class="fu">here</span>(<span class="st">&quot;Functions_R&quot;</span>))</span></code></pre></div>
 </div>
 <div id="data-download-rdata." class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Data Download
@@ -7046,10 +7047,709 @@ CMR_LGE_midwall_apical
 </tbody>
 </table>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">export2word</span>(<span class="at">x =</span> Descr_table, </span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>            <span class="at">file =</span> <span class="fu">here</span>(tables_output_dir, <span class="fu">paste0</span>(<span class="st">&quot;Tab4-univ-all-death-&quot;</span>,<span class="fu">Sys.Date</span>(), <span class="st">&quot;.docx&quot;</span>)), </span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>            <span class="at">file =</span> <span class="fu">here</span>(tables_output_dir, <span class="fu">paste0</span>(<span class="st">&quot;Tab3-univ-all-death-&quot;</span>,<span class="fu">Sys.Date</span>(), <span class="st">&quot;.docx&quot;</span>)), </span>
 <span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>            <span class="at">which.table=</span><span class="st">&quot;descr&quot;</span>, <span class="at">nmax=</span><span class="cn">TRUE</span>, <span class="at">header.labels=</span><span class="fu">c</span>(), </span>
 <span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>            <span class="at">caption=</span><span class="cn">NULL</span>, <span class="at">strip=</span><span class="cn">FALSE</span>, <span class="at">first.strip=</span><span class="cn">FALSE</span>, <span class="at">background=</span><span class="st">&quot;#D2D2D2&quot;</span>,</span>
 <span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>            <span class="at">size=</span><span class="cn">NULL</span>, <span class="at">header.background=</span><span class="cn">NULL</span>, <span class="at">header.color=</span><span class="cn">NULL</span>)</span></code></pre></div>
+</div>
+<div id="tab4-multi-all-death" class="section level3" number="4.3.2">
+<h3><span class="header-section-number">4.3.2</span>
+Tab4-multi-all-death</h3>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>df <span class="ot">&lt;-</span> df_all <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="at">event =</span> outcome_death,</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>  <span class="at">time =</span> outcome_FU_time_death,</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>  <span class="at">CMR_LVEF_5 =</span> CMR_LVEF<span class="sc">/</span><span class="dv">5</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>  event, time,</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>  demo_age, demo_gender, demo_BMI , CV_risk_diabete , CV_risk_Smoking , CV_risk_HTA,  CV_risk_Smoking, CV_risk_dyslipidemia ,  history_hospit_HF, history_AFib, med_CKD, history_med_MI , CMR_LVEF_5, CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_presence, CMR_LGE_midwall_location_3, CMR_LGE_midwall_extent_count, outcome_revascularisation_90days) <span class="sc">%&gt;%</span> <span class="fu">droplevels</span>()</span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co"># Define models</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a>models <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>  <span class="at">model1 =</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(time, event) <span class="sc">~</span> ., <span class="at">data =</span> df <span class="sc">%&gt;%</span> <span class="fu">select</span>(event<span class="sc">:</span>CMR_LVEF_5)),</span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>  <span class="at">model2 =</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(time, event) <span class="sc">~</span> ., <span class="at">data =</span> df <span class="sc">%&gt;%</span> <span class="fu">select</span>(event<span class="sc">:</span>CMR_LGE_ischemic_extent_count)),</span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a>  <span class="at">model3A =</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(time, event) <span class="sc">~</span> ., <span class="at">data =</span> df <span class="sc">%&gt;%</span> <span class="fu">select</span>(event<span class="sc">:</span>CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_presence)),</span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a>  <span class="at">model3B =</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(time, event) <span class="sc">~</span> ., <span class="at">data =</span> df <span class="sc">%&gt;%</span> <span class="fu">select</span>(event<span class="sc">:</span>CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_location_3)),</span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a>  <span class="at">model3C =</span> <span class="fu">coxph</span>(<span class="fu">Surv</span>(time, event) <span class="sc">~</span> ., <span class="at">data =</span> df <span class="sc">%&gt;%</span> <span class="fu">select</span>(event<span class="sc">:</span>CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_extent_count))</span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>)</span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a></span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a><span class="co"># Extract model statistics and combine</span></span>
+<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a>model_stats <span class="ot">&lt;-</span> <span class="fu">lapply</span>(models, extract_model_stats) <span class="co"># adaptation possible to have more decimals</span></span>
+<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a></span>
+<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a><span class="co"># Rename the columns in each dataframe to include the model name</span></span>
+<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a>model_stats_named <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">names</span>(model_stats), <span class="cf">function</span>(model_name) {</span>
+<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a>  data <span class="ot">&lt;-</span> model_stats[[model_name]]</span>
+<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a>  <span class="co"># Ensure row names are in a column (if not already)</span></span>
+<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="st">&quot;A_Variable&quot;</span> <span class="sc">%in%</span> <span class="fu">colnames</span>(data)) {</span>
+<span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a>    data<span class="sc">$</span>A_Variable <span class="ot">&lt;-</span> <span class="fu">rownames</span>(data)</span>
+<span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a>  }</span>
+<span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a>  <span class="co"># Rename other columns to include the model name for uniqueness</span></span>
+<span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a>  <span class="fu">colnames</span>(data)[<span class="sc">-</span><span class="fu">which</span>(<span class="fu">colnames</span>(data) <span class="sc">==</span> <span class="st">&quot;A_Variable&quot;</span>)] <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="fu">colnames</span>(data)[<span class="sc">-</span><span class="fu">which</span>(<span class="fu">colnames</span>(data) <span class="sc">==</span> <span class="st">&quot;A_Variable&quot;</span>)], model_name, <span class="at">sep =</span> <span class="st">&quot;_&quot;</span>)</span>
+<span id="cb14-30"><a href="#cb14-30" tabindex="-1"></a>  <span class="fu">return</span>(data)</span>
+<span id="cb14-31"><a href="#cb14-31" tabindex="-1"></a>})</span>
+<span id="cb14-32"><a href="#cb14-32" tabindex="-1"></a></span>
+<span id="cb14-33"><a href="#cb14-33" tabindex="-1"></a><span class="co"># Combine all models using full_join, join by &#39;Variable&#39;</span></span>
+<span id="cb14-34"><a href="#cb14-34" tabindex="-1"></a>combined_models <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">reduce</span>(model_stats_named, full_join, <span class="at">by =</span> <span class="st">&quot;A_Variable&quot;</span>)</span>
+<span id="cb14-35"><a href="#cb14-35" tabindex="-1"></a></span>
+<span id="cb14-36"><a href="#cb14-36" tabindex="-1"></a><span class="co"># Set &#39;Variable&#39; as rownames and remove &#39;Variable&#39; from the dataframe columns</span></span>
+<span id="cb14-37"><a href="#cb14-37" tabindex="-1"></a><span class="fu">rownames</span>(combined_models) <span class="ot">&lt;-</span> combined_models<span class="sc">$</span>A_Variable</span>
+<span id="cb14-38"><a href="#cb14-38" tabindex="-1"></a>combined_models<span class="sc">$</span>A_Variable <span class="ot">&lt;-</span> <span class="cn">NULL</span></span>
+<span id="cb14-39"><a href="#cb14-39" tabindex="-1"></a></span>
+<span id="cb14-40"><a href="#cb14-40" tabindex="-1"></a></span>
+<span id="cb14-41"><a href="#cb14-41" tabindex="-1"></a><span class="co"># export in html</span></span>
+<span id="cb14-42"><a href="#cb14-42" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(combined_models, <span class="at">caption =</span> <span class="st">&quot;Models multi- all pop (N=6,082)&quot;</span>, <span class="at">format =</span> <span class="st">&quot;html&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-43"><a href="#cb14-43" tabindex="-1"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">full_width =</span> F, <span class="at">bootstrap_options =</span> <span class="fu">c</span>(<span class="st">&quot;striped&quot;</span>, <span class="st">&quot;hover&quot;</span>, <span class="st">&quot;condensed&quot;</span>, <span class="st">&quot;bordered&quot;</span>))</span></code></pre></div>
+<table class="table table-striped table-hover table-condensed table-bordered" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>
+Models multi- all pop (N=6,082)
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+HR_CI_model1
+</th>
+<th style="text-align:left;">
+p_value_model1
+</th>
+<th style="text-align:left;">
+HR_CI_model2
+</th>
+<th style="text-align:left;">
+p_value_model2
+</th>
+<th style="text-align:left;">
+HR_CI_model3A
+</th>
+<th style="text-align:left;">
+p_value_model3A
+</th>
+<th style="text-align:left;">
+HR_CI_model3B
+</th>
+<th style="text-align:left;">
+p_value_model3B
+</th>
+<th style="text-align:left;">
+HR_CI_model3C
+</th>
+<th style="text-align:left;">
+p_value_model3C
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+demo_age
+</td>
+<td style="text-align:left;">
+1.03 ( 1.03 - 1.04 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+1.02 ( 1.02 - 1.03 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+1.02 ( 1.01 - 1.03 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+1.02 ( 1.01 - 1.03 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+1.02 ( 1.01 - 1.03 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+demo_genderYes
+</td>
+<td style="text-align:left;">
+2.69 ( 2.11 - 3.43 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+2.24 ( 1.76 - 2.86 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+2.29 ( 1.80 - 2.92 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+2.29 ( 1.80 - 2.92 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+2.33 ( 1.82 - 2.97 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+demo_BMI
+</td>
+<td style="text-align:left;">
+1.01 ( 0.99 - 1.02 )
+</td>
+<td style="text-align:left;">
+0.543
+</td>
+<td style="text-align:left;">
+1.01 ( 1.00 - 1.03 )
+</td>
+<td style="text-align:left;">
+0.167
+</td>
+<td style="text-align:left;">
+1.01 ( 0.99 - 1.03 )
+</td>
+<td style="text-align:left;">
+0.324
+</td>
+<td style="text-align:left;">
+1.01 ( 0.99 - 1.03 )
+</td>
+<td style="text-align:left;">
+0.173
+</td>
+<td style="text-align:left;">
+1.01 ( 0.99 - 1.02 )
+</td>
+<td style="text-align:left;">
+0.475
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CV_risk_diabeteYes
+</td>
+<td style="text-align:left;">
+1.94 ( 1.65 - 2.28 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+1.56 ( 1.33 - 1.83 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+1.56 ( 1.33 - 1.83 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+1.52 ( 1.30 - 1.79 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+1.51 ( 1.28 - 1.77 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CV_risk_SmokingYes
+</td>
+<td style="text-align:left;">
+1.27 ( 1.05 - 1.54 )
+</td>
+<td style="text-align:left;">
+0.015
+</td>
+<td style="text-align:left;">
+1.25 ( 1.03 - 1.52 )
+</td>
+<td style="text-align:left;">
+0.025
+</td>
+<td style="text-align:left;">
+1.29 ( 1.06 - 1.57 )
+</td>
+<td style="text-align:left;">
+0.011
+</td>
+<td style="text-align:left;">
+1.26 ( 1.03 - 1.54 )
+</td>
+<td style="text-align:left;">
+0.022
+</td>
+<td style="text-align:left;">
+1.25 ( 1.02 - 1.52 )
+</td>
+<td style="text-align:left;">
+0.028
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CV_risk_HTAYes
+</td>
+<td style="text-align:left;">
+0.76 ( 0.64 - 0.89 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+0.78 ( 0.66 - 0.92 )
+</td>
+<td style="text-align:left;">
+0.004
+</td>
+<td style="text-align:left;">
+0.76 ( 0.64 - 0.90 )
+</td>
+<td style="text-align:left;">
+0.001
+</td>
+<td style="text-align:left;">
+0.79 ( 0.67 - 0.93 )
+</td>
+<td style="text-align:left;">
+0.006
+</td>
+<td style="text-align:left;">
+0.79 ( 0.67 - 0.93 )
+</td>
+<td style="text-align:left;">
+0.006
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CV_risk_dyslipidemiaYes
+</td>
+<td style="text-align:left;">
+0.98 ( 0.84 - 1.15 )
+</td>
+<td style="text-align:left;">
+0.827
+</td>
+<td style="text-align:left;">
+0.99 ( 0.84 - 1.16 )
+</td>
+<td style="text-align:left;">
+0.877
+</td>
+<td style="text-align:left;">
+1.03 ( 0.88 - 1.21 )
+</td>
+<td style="text-align:left;">
+0.734
+</td>
+<td style="text-align:left;">
+1.05 ( 0.89 - 1.23 )
+</td>
+<td style="text-align:left;">
+0.562
+</td>
+<td style="text-align:left;">
+1.07 ( 0.91 - 1.25 )
+</td>
+<td style="text-align:left;">
+0.424
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+history_hospit_HFYes
+</td>
+<td style="text-align:left;">
+1.69 ( 1.32 - 2.16 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+1.27 ( 0.98 - 1.64 )
+</td>
+<td style="text-align:left;">
+0.068
+</td>
+<td style="text-align:left;">
+1.35 ( 1.05 - 1.74 )
+</td>
+<td style="text-align:left;">
+0.021
+</td>
+<td style="text-align:left;">
+1.26 ( 0.98 - 1.64 )
+</td>
+<td style="text-align:left;">
+0.073
+</td>
+<td style="text-align:left;">
+1.41 ( 1.09 - 1.83 )
+</td>
+<td style="text-align:left;">
+0.008
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+history_AFibYes
+</td>
+<td style="text-align:left;">
+1.02 ( 0.79 - 1.31 )
+</td>
+<td style="text-align:left;">
+0.903
+</td>
+<td style="text-align:left;">
+0.95 ( 0.74 - 1.23 )
+</td>
+<td style="text-align:left;">
+0.723
+</td>
+<td style="text-align:left;">
+0.98 ( 0.76 - 1.27 )
+</td>
+<td style="text-align:left;">
+0.898
+</td>
+<td style="text-align:left;">
+0.94 ( 0.73 - 1.22 )
+</td>
+<td style="text-align:left;">
+0.667
+</td>
+<td style="text-align:left;">
+1.00 ( 0.77 - 1.29 )
+</td>
+<td style="text-align:left;">
+0.976
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+med_CKDYes
+</td>
+<td style="text-align:left;">
+2.82 ( 2.00 - 3.99 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+2.64 ( 1.87 - 3.73 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+2.66 ( 1.88 - 3.75 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+2.78 ( 1.97 - 3.92 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+2.70 ( 1.91 - 3.81 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+history_med_MIYes
+</td>
+<td style="text-align:left;">
+1.02 ( 0.86 - 1.19 )
+</td>
+<td style="text-align:left;">
+0.854
+</td>
+<td style="text-align:left;">
+1.00 ( 0.85 - 1.17 )
+</td>
+<td style="text-align:left;">
+0.982
+</td>
+<td style="text-align:left;">
+0.99 ( 0.84 - 1.16 )
+</td>
+<td style="text-align:left;">
+0.865
+</td>
+<td style="text-align:left;">
+0.99 ( 0.84 - 1.17 )
+</td>
+<td style="text-align:left;">
+0.898
+</td>
+<td style="text-align:left;">
+0.99 ( 0.84 - 1.16 )
+</td>
+<td style="text-align:left;">
+0.860
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CMR_LVEF_5
+</td>
+<td style="text-align:left;">
+0.90 ( 0.85 - 0.96 )
+</td>
+<td style="text-align:left;">
+0.002
+</td>
+<td style="text-align:left;">
+0.93 ( 0.87 - 0.99 )
+</td>
+<td style="text-align:left;">
+0.023
+</td>
+<td style="text-align:left;">
+0.95 ( 0.89 - 1.01 )
+</td>
+<td style="text-align:left;">
+0.111
+</td>
+<td style="text-align:left;">
+0.96 ( 0.90 - 1.02 )
+</td>
+<td style="text-align:left;">
+0.172
+</td>
+<td style="text-align:left;">
+0.95 ( 0.89 - 1.01 )
+</td>
+<td style="text-align:left;">
+0.088
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CMR_LGE_ischemic_extent_count
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+1.63 ( 1.57 - 1.68 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+1.60 ( 1.54 - 1.65 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+1.59 ( 1.54 - 1.65 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+1.59 ( 1.54 - 1.65 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CMR_LGE_midwall_presenceB_Presence_of_midwall_LGE
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2.45 ( 2.05 - 2.93 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CMR_LGE_midwall_location_3Midwall_LGE_not_at_risk
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+1.49 ( 1.14 - 1.95 )
+</td>
+<td style="text-align:left;">
+0.003
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CMR_LGE_midwall_location_3At_risk_midwall_LGE_(septal_and/or_lateral)
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+3.92 ( 3.16 - 4.87 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+CMR_LGE_midwall_extent_count
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+2.05 ( 1.83 - 2.30 )
+</td>
+<td style="text-align:left;">
+&lt;0.001
+</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>combined_models<span class="sc">$</span>A_Variable <span class="ot">&lt;-</span> <span class="fu">rownames</span>(combined_models)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co"># Make A_Variable the first column</span></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>combined_models <span class="ot">&lt;-</span> combined_models <span class="sc">%&gt;%</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>  <span class="fu">select</span>(A_Variable, <span class="fu">everything</span>())</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="co"># Export in word</span></span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>ft <span class="ot">&lt;-</span> <span class="fu">flextable</span>(combined_models)</span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>ft <span class="ot">&lt;-</span> <span class="fu">set_table_properties</span>(ft, <span class="at">layout =</span> <span class="st">&quot;autofit&quot;</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>doc <span class="ot">&lt;-</span> <span class="fu">read_docx</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>  <span class="fu">body_add_par</span>(<span class="st">&quot;Model full - all pop (N=6,082)&quot;</span>, <span class="at">style =</span> <span class="st">&quot;heading 1&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>  <span class="fu">body_add_flextable</span>(ft)</span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="fu">print</span>(doc, <span class="at">target =</span> <span class="fu">here</span>(tables_output_dir,<span class="fu">paste0</span>(<span class="st">&quot;Tab4-multi-all-death-&quot;</span>,<span class="fu">Sys.Date</span>(), <span class="st">&quot;.docx&quot;</span>)))</span></code></pre></div>
 </div>
 </div>
 </div>

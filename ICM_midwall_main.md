@@ -39,6 +39,7 @@ library(DataExplorer)         # Exploratory data analysis
 library(compareGroups)        # Comparing groups
 library(psych)                # Psychological statistics and data manipulation
 library(Hmisc)                # Miscellaneous functions for data analysis
+library(purrr)
 
 # ---- Survival analysis
 library(poptrend)             # Calculating p-trend in survival analysis
@@ -1879,8 +1880,314 @@ export2md(Descr_table, strip=TRUE, first.strip=TRUE)
 
 ```r
 export2word(x = Descr_table, 
-            file = here(tables_output_dir, paste0("Tab4-univ-all-death-",Sys.Date(), ".docx")), 
+            file = here(tables_output_dir, paste0("Tab3-univ-all-death-",Sys.Date(), ".docx")), 
             which.table="descr", nmax=TRUE, header.labels=c(), 
             caption=NULL, strip=FALSE, first.strip=FALSE, background="#D2D2D2",
             size=NULL, header.background=NULL, header.color=NULL)
+```
+### Tab4-multi-all-death
+
+```r
+df <- df_all %>% mutate(
+  event = outcome_death,
+  time = outcome_FU_time_death,
+  CMR_LVEF_5 = CMR_LVEF/5
+) %>% select(
+  event, time,
+  demo_age, demo_gender, demo_BMI , CV_risk_diabete , CV_risk_Smoking , CV_risk_HTA,  CV_risk_Smoking, CV_risk_dyslipidemia ,  history_hospit_HF, history_AFib, med_CKD, history_med_MI , CMR_LVEF_5, CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_presence, CMR_LGE_midwall_location_3, CMR_LGE_midwall_extent_count, outcome_revascularisation_90days) %>% droplevels()
+
+# Define models
+models <- list(
+  model1 = coxph(Surv(time, event) ~ ., data = df %>% select(event:CMR_LVEF_5)),
+  model2 = coxph(Surv(time, event) ~ ., data = df %>% select(event:CMR_LGE_ischemic_extent_count)),
+  model3A = coxph(Surv(time, event) ~ ., data = df %>% select(event:CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_presence)),
+  model3B = coxph(Surv(time, event) ~ ., data = df %>% select(event:CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_location_3)),
+  model3C = coxph(Surv(time, event) ~ ., data = df %>% select(event:CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_extent_count))
+)
+
+# Extract model statistics and combine
+model_stats <- lapply(models, extract_model_stats) # adaptation possible to have more decimals
+
+# Rename the columns in each dataframe to include the model name
+model_stats_named <- lapply(names(model_stats), function(model_name) {
+  data <- model_stats[[model_name]]
+  # Ensure row names are in a column (if not already)
+  if (!"A_Variable" %in% colnames(data)) {
+    data$A_Variable <- rownames(data)
+  }
+  # Rename other columns to include the model name for uniqueness
+  colnames(data)[-which(colnames(data) == "A_Variable")] <- paste(colnames(data)[-which(colnames(data) == "A_Variable")], model_name, sep = "_")
+  return(data)
+})
+
+# Combine all models using full_join, join by 'Variable'
+combined_models <- purrr::reduce(model_stats_named, full_join, by = "A_Variable")
+
+# Set 'Variable' as rownames and remove 'Variable' from the dataframe columns
+rownames(combined_models) <- combined_models$A_Variable
+combined_models$A_Variable <- NULL
+
+
+# export in html
+knitr::kable(combined_models, caption = "Models multi- all pop (N=6,082)", format = "html") %>%
+  kableExtra::kable_styling(full_width = F, bootstrap_options = c("striped", "hover", "condensed", "bordered"))
+```
+
+<table class="table table-striped table-hover table-condensed table-bordered" style="color: black; width: auto !important; margin-left: auto; margin-right: auto;">
+<caption>Models multi- all pop (N=6,082)</caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:left;"> HR_CI_model1 </th>
+   <th style="text-align:left;"> p_value_model1 </th>
+   <th style="text-align:left;"> HR_CI_model2 </th>
+   <th style="text-align:left;"> p_value_model2 </th>
+   <th style="text-align:left;"> HR_CI_model3A </th>
+   <th style="text-align:left;"> p_value_model3A </th>
+   <th style="text-align:left;"> HR_CI_model3B </th>
+   <th style="text-align:left;"> p_value_model3B </th>
+   <th style="text-align:left;"> HR_CI_model3C </th>
+   <th style="text-align:left;"> p_value_model3C </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> demo_age </td>
+   <td style="text-align:left;"> 1.03 ( 1.03 - 1.04 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 1.02 ( 1.02 - 1.03 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 1.02 ( 1.01 - 1.03 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 1.02 ( 1.01 - 1.03 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 1.02 ( 1.01 - 1.03 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> demo_genderYes </td>
+   <td style="text-align:left;"> 2.69 ( 2.11 - 3.43 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 2.24 ( 1.76 - 2.86 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 2.29 ( 1.80 - 2.92 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 2.29 ( 1.80 - 2.92 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 2.33 ( 1.82 - 2.97 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> demo_BMI </td>
+   <td style="text-align:left;"> 1.01 ( 0.99 - 1.02 ) </td>
+   <td style="text-align:left;"> 0.543 </td>
+   <td style="text-align:left;"> 1.01 ( 1.00 - 1.03 ) </td>
+   <td style="text-align:left;"> 0.167 </td>
+   <td style="text-align:left;"> 1.01 ( 0.99 - 1.03 ) </td>
+   <td style="text-align:left;"> 0.324 </td>
+   <td style="text-align:left;"> 1.01 ( 0.99 - 1.03 ) </td>
+   <td style="text-align:left;"> 0.173 </td>
+   <td style="text-align:left;"> 1.01 ( 0.99 - 1.02 ) </td>
+   <td style="text-align:left;"> 0.475 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV_risk_diabeteYes </td>
+   <td style="text-align:left;"> 1.94 ( 1.65 - 2.28 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 1.56 ( 1.33 - 1.83 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 1.56 ( 1.33 - 1.83 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 1.52 ( 1.30 - 1.79 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 1.51 ( 1.28 - 1.77 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV_risk_SmokingYes </td>
+   <td style="text-align:left;"> 1.27 ( 1.05 - 1.54 ) </td>
+   <td style="text-align:left;"> 0.015 </td>
+   <td style="text-align:left;"> 1.25 ( 1.03 - 1.52 ) </td>
+   <td style="text-align:left;"> 0.025 </td>
+   <td style="text-align:left;"> 1.29 ( 1.06 - 1.57 ) </td>
+   <td style="text-align:left;"> 0.011 </td>
+   <td style="text-align:left;"> 1.26 ( 1.03 - 1.54 ) </td>
+   <td style="text-align:left;"> 0.022 </td>
+   <td style="text-align:left;"> 1.25 ( 1.02 - 1.52 ) </td>
+   <td style="text-align:left;"> 0.028 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV_risk_HTAYes </td>
+   <td style="text-align:left;"> 0.76 ( 0.64 - 0.89 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 0.78 ( 0.66 - 0.92 ) </td>
+   <td style="text-align:left;"> 0.004 </td>
+   <td style="text-align:left;"> 0.76 ( 0.64 - 0.90 ) </td>
+   <td style="text-align:left;"> 0.001 </td>
+   <td style="text-align:left;"> 0.79 ( 0.67 - 0.93 ) </td>
+   <td style="text-align:left;"> 0.006 </td>
+   <td style="text-align:left;"> 0.79 ( 0.67 - 0.93 ) </td>
+   <td style="text-align:left;"> 0.006 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV_risk_dyslipidemiaYes </td>
+   <td style="text-align:left;"> 0.98 ( 0.84 - 1.15 ) </td>
+   <td style="text-align:left;"> 0.827 </td>
+   <td style="text-align:left;"> 0.99 ( 0.84 - 1.16 ) </td>
+   <td style="text-align:left;"> 0.877 </td>
+   <td style="text-align:left;"> 1.03 ( 0.88 - 1.21 ) </td>
+   <td style="text-align:left;"> 0.734 </td>
+   <td style="text-align:left;"> 1.05 ( 0.89 - 1.23 ) </td>
+   <td style="text-align:left;"> 0.562 </td>
+   <td style="text-align:left;"> 1.07 ( 0.91 - 1.25 ) </td>
+   <td style="text-align:left;"> 0.424 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_hospit_HFYes </td>
+   <td style="text-align:left;"> 1.69 ( 1.32 - 2.16 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 1.27 ( 0.98 - 1.64 ) </td>
+   <td style="text-align:left;"> 0.068 </td>
+   <td style="text-align:left;"> 1.35 ( 1.05 - 1.74 ) </td>
+   <td style="text-align:left;"> 0.021 </td>
+   <td style="text-align:left;"> 1.26 ( 0.98 - 1.64 ) </td>
+   <td style="text-align:left;"> 0.073 </td>
+   <td style="text-align:left;"> 1.41 ( 1.09 - 1.83 ) </td>
+   <td style="text-align:left;"> 0.008 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_AFibYes </td>
+   <td style="text-align:left;"> 1.02 ( 0.79 - 1.31 ) </td>
+   <td style="text-align:left;"> 0.903 </td>
+   <td style="text-align:left;"> 0.95 ( 0.74 - 1.23 ) </td>
+   <td style="text-align:left;"> 0.723 </td>
+   <td style="text-align:left;"> 0.98 ( 0.76 - 1.27 ) </td>
+   <td style="text-align:left;"> 0.898 </td>
+   <td style="text-align:left;"> 0.94 ( 0.73 - 1.22 ) </td>
+   <td style="text-align:left;"> 0.667 </td>
+   <td style="text-align:left;"> 1.00 ( 0.77 - 1.29 ) </td>
+   <td style="text-align:left;"> 0.976 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> med_CKDYes </td>
+   <td style="text-align:left;"> 2.82 ( 2.00 - 3.99 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 2.64 ( 1.87 - 3.73 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 2.66 ( 1.88 - 3.75 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 2.78 ( 1.97 - 3.92 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 2.70 ( 1.91 - 3.81 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> history_med_MIYes </td>
+   <td style="text-align:left;"> 1.02 ( 0.86 - 1.19 ) </td>
+   <td style="text-align:left;"> 0.854 </td>
+   <td style="text-align:left;"> 1.00 ( 0.85 - 1.17 ) </td>
+   <td style="text-align:left;"> 0.982 </td>
+   <td style="text-align:left;"> 0.99 ( 0.84 - 1.16 ) </td>
+   <td style="text-align:left;"> 0.865 </td>
+   <td style="text-align:left;"> 0.99 ( 0.84 - 1.17 ) </td>
+   <td style="text-align:left;"> 0.898 </td>
+   <td style="text-align:left;"> 0.99 ( 0.84 - 1.16 ) </td>
+   <td style="text-align:left;"> 0.860 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LVEF_5 </td>
+   <td style="text-align:left;"> 0.90 ( 0.85 - 0.96 ) </td>
+   <td style="text-align:left;"> 0.002 </td>
+   <td style="text-align:left;"> 0.93 ( 0.87 - 0.99 ) </td>
+   <td style="text-align:left;"> 0.023 </td>
+   <td style="text-align:left;"> 0.95 ( 0.89 - 1.01 ) </td>
+   <td style="text-align:left;"> 0.111 </td>
+   <td style="text-align:left;"> 0.96 ( 0.90 - 1.02 ) </td>
+   <td style="text-align:left;"> 0.172 </td>
+   <td style="text-align:left;"> 0.95 ( 0.89 - 1.01 ) </td>
+   <td style="text-align:left;"> 0.088 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_ischemic_extent_count </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> 1.63 ( 1.57 - 1.68 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 1.60 ( 1.54 - 1.65 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 1.59 ( 1.54 - 1.65 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> 1.59 ( 1.54 - 1.65 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_presenceB_Presence_of_midwall_LGE </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> 2.45 ( 2.05 - 2.93 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_location_3Midwall_LGE_not_at_risk </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> 1.49 ( 1.14 - 1.95 ) </td>
+   <td style="text-align:left;"> 0.003 </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_location_3At_risk_midwall_LGE_(septal_and/or_lateral) </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> 3.92 ( 3.16 - 4.87 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CMR_LGE_midwall_extent_count </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> NA </td>
+   <td style="text-align:left;"> 2.05 ( 1.83 - 2.30 ) </td>
+   <td style="text-align:left;"> &lt;0.001 </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+combined_models$A_Variable <- rownames(combined_models)
+
+# Make A_Variable the first column
+combined_models <- combined_models %>%
+  select(A_Variable, everything())
+
+# Export in word
+ft <- flextable(combined_models)
+ft <- set_table_properties(ft, layout = "autofit")
+doc <- read_docx() %>%
+  body_add_par("Model full - all pop (N=6,082)", style = "heading 1") %>%
+  body_add_flextable(ft)
+
+print(doc, target = here(tables_output_dir,paste0("Tab4-multi-all-death-",Sys.Date(), ".docx")))
 ```

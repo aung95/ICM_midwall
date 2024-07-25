@@ -1,5 +1,5 @@
 # Function to extract model statistics
-extract_model_stats <- function(model, show.coef = TRUE, conf_level = 0.95, decimals = 2) {
+extract_model_stats <- function(model, show.coef = FALSE, conf_level = 0.95, decimals = 2) {
   
   # Extract coefficients and their confidence intervals
   coefficients <- coef(model)

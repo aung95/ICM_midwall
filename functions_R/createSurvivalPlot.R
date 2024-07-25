@@ -9,7 +9,7 @@ createSurvivalPlot <- function(
     compared_with,
     time = "outcome_FU_time_death",
     event = "outcome_death",
-    confint_choosen = 0.995,
+    confint_choosen = 0.95,
     legend_title = "Legend_title",
     mytitle = "KM_title",
     my_legends = NULL,  # Default legend labels
@@ -17,7 +17,7 @@ createSurvivalPlot <- function(
     show.CI = TRUE,
     show.pval = TRUE,
     ylim_choosen = c(0, 1),
-    xlim_choosen = c(0, 13),
+    xlim_choosen = c(0, 11),
     size_font = 12
 ) {
   
