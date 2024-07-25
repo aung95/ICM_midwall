@@ -462,7 +462,7 @@ D <- incremental_function(
   df = df_all,
   event = "outcome_death",
   time = "outcome_FU_time_death",
-  time_analyzed = 12, # median(df_all$outcome_FU_time_death/12), # big debate on which value to use (use in NRI and IDI)
+  time_analyzed = median(df_all$outcome_FU_time_death/12), # big debate on which value to use (use in NRI and IDI)
   var_1 = var_base,
   var_2 = c(var_base,c("CMR_LGE_ischemic_extent_count")),
   var_3 = c(var_base,c("CMR_LGE_ischemic_extent_count",
@@ -717,6 +717,7 @@ ggsave(
   plot = results$ggsurv$table, width = 10, height = 3, units = "in", dpi = 600)
 ```
 ### Fig5-ForestPlot
+Find a way to save this plot
 ```{r Fig5-ForestPlot}
 library(forestplot)
 # function
@@ -786,7 +787,409 @@ forest_plot <- base_data |>
 print(forest_plot)
 
 # dev.off()
-
 ```
 
 # Midwall population (N=702)
+## descriptive
+### Tab6-descr-all-LGE_midwall_location
+" Suppl table S3"
+```{r Tab6-descr-all-LGE_midwall_location}
+df <- df_all %>% filter(CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE") %>% droplevels()
+
+Descr_table = createTable(compareGroups(
+  CMR_LGE_midwall_location_3 ~ 
+    demo_age + demo_gender + demo_BMI + CV_risk_diabete + 
+    CV_risk_HTA + CV_risk_obesity + CV_risk_dyslipidemia + CV_risk_Smoking + 
+    
+    history_med_MI  + history_coronary_procedure + history_interv_PCI + 
+    history_interv_CABG + med_periph_atheroma + history_stroke + 
+    med_pacemaker + med_CKD + history_hospit_HF + history_AFib + clini_NYHA + 
+    clini_cardiac_rythm + 
+    
+    CMR_LVEF + CMR_LVEDV + 
+    CMR_LVESV + CMR_LV_mass + CMR_RV_dysfunction + 
+    
+    CMR_LGE_presence_ischemic_and_midwall +
+    
+    CMR_LGE_ischemic_presence + 
+    CMR_LGE_ischemic_extent_count +
+    CMR_LGE_ischemic_extent_categ +
+    CMR_LGE_ischemic_transmurality +
+    CMR_LGE_ischemic_location_4 +
+    
+    CMR_LGE_midwall_extent_count + 
+    CMR_LGE_midwall_extent_categ +
+    CMR_LGE_midwall_location_3 + 
+    CMR_LGE_midwall_location_4 +
+    CMR_LGE_midwall_anterior +
+    CMR_LGE_midwall_septal +
+    CMR_LGE_midwall_inferior +
+    CMR_LGE_midwall_lateral +
+    CMR_LGE_midwall_apical +
+    
+    outcome_revascularisation_90days,
+  data= df,
+  method = 1, conf.level = 0.95),
+  hide.no = "No",
+  show.all=T, show.p.overall = T) 
+
+export2md(Descr_table, strip=TRUE, first.strip=TRUE)
+
+export2word(x = Descr_table, 
+            file = here(tables_output_dir, paste0("Tab6-descr-all-LGE_midwall_location-",Sys.Date(), ".docx")), 
+            which.table="descr", nmax=TRUE, header.labels=c(), 
+            caption=NULL, strip=FALSE, first.strip=FALSE, background="#D2D2D2",
+            size=NULL, header.background=NULL, header.color=NULL)
+```
+### Tab7-descr-all-LGE_midwall_isch_add
+" Suppl table S34
+```{r Tab7-descr-all-LGE_midwall_isch_add}
+df <- df_all %>% filter(CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE") %>% droplevels()
+
+Descr_table = createTable(compareGroups(
+  CMR_LGE_ischemic_presence ~ 
+    demo_age + demo_gender + demo_BMI + CV_risk_diabete + 
+    CV_risk_HTA + CV_risk_obesity + CV_risk_dyslipidemia + CV_risk_Smoking + 
+    
+    history_med_MI  + history_coronary_procedure + history_interv_PCI + 
+    history_interv_CABG + med_periph_atheroma + history_stroke + 
+    med_pacemaker + med_CKD + history_hospit_HF + history_AFib + clini_NYHA + 
+    clini_cardiac_rythm + 
+    
+    CMR_LVEF + CMR_LVEDV + 
+    CMR_LVESV + CMR_LV_mass + CMR_RV_dysfunction + 
+    
+    CMR_LGE_presence_ischemic_and_midwall +
+    
+    CMR_LGE_ischemic_extent_count +
+    CMR_LGE_ischemic_extent_categ +
+    CMR_LGE_ischemic_transmurality +
+    CMR_LGE_ischemic_location_4 +
+    
+    CMR_LGE_midwall_extent_count + 
+    CMR_LGE_midwall_extent_categ +
+    CMR_LGE_midwall_location_3 + 
+    CMR_LGE_midwall_location_4 +
+    CMR_LGE_midwall_anterior +
+    CMR_LGE_midwall_septal +
+    CMR_LGE_midwall_inferior +
+    CMR_LGE_midwall_lateral +
+    CMR_LGE_midwall_apical +
+    
+    outcome_revascularisation_90days,
+  data= df,
+  method = 1, conf.level = 0.95),
+  hide.no = "No",
+  show.all=T, show.p.overall = T) 
+
+export2md(Descr_table, strip=TRUE, first.strip=TRUE)
+
+export2word(x = Descr_table, 
+            file = here(tables_output_dir, paste0("Tab7-descr-all-LGE_midwall_isch_add-",Sys.Date(), ".docx")), 
+            which.table="descr", nmax=TRUE, header.labels=c(), 
+            caption=NULL, strip=FALSE, first.strip=FALSE, background="#D2D2D2",
+            size=NULL, header.background=NULL, header.color=NULL)
+```
+## Survival
+### Tab8-univ-mid-death
+```{r Tab8-univ-mid-death}
+df_selected <- df_all %>%
+  filter(CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE") %>%
+  mutate(
+    surv.event = Surv(
+      time = outcome_FU_time_death,
+      event = outcome_death
+    ),
+    CMR_LVEF_5 = CMR_LVEF/5,
+    CMR_LVEDV_5 = CMR_LVEDV/10,
+    CMR_LVESV_5 = CMR_LVESV/10
+  ) %>% droplevels()
+
+# location
+model <- coxph(formula = surv.event ~ CMR_LGE_midwall_location_3, data = df_selected)
+print("CMR_LGE_midwall_location_3 for all-cause death in midwall pop (N=702")
+extract_model_stats(model, conf_level = 0.95, show.coef = F, decimals = 3)
+
+# extent
+model <- coxph(formula = surv.event ~ CMR_LGE_midwall_extent_categ, data = df_selected)
+print("CMR_LGE_midwall_extent_categ for all-cause death in midwall pop (N=702")
+extract_model_stats(model, conf_level = 0.95, show.coef = F, decimals = 3)
+
+# ischemic added
+model <- coxph(formula = surv.event ~ CMR_LGE_ischemic_presence, data = df_selected)
+print("CMR_LGE_ischemic_presence for all-cause death in midwall pop (N=702")
+extract_model_stats(model, conf_level = 0.95, show.coef = F, decimals = 3)
+
+
+Descr_table = createTable(compareGroups(
+  surv.event ~ 
+    demo_age + demo_gender + demo_BMI + CV_risk_diabete + 
+    CV_risk_HTA + CV_risk_obesity + CV_risk_dyslipidemia + CV_risk_Smoking + 
+    
+    history_med_MI  + history_coronary_procedure + history_interv_PCI + 
+    history_interv_CABG + med_periph_atheroma + history_stroke + 
+    med_pacemaker + med_CKD + history_hospit_HF + history_AFib + clini_NYHA + 
+    clini_cardiac_rythm + 
+    
+   outcome_revascularisation_90days +
+    
+    CMR_LVEF_5 + CMR_LVEDV_5 + 
+    CMR_LVESV_5 + CMR_LV_mass + CMR_RV_dysfunction + 
+    
+    CMR_LGE_presence_ischemic_and_midwall +
+    
+    CMR_LGE_ischemic_presence + 
+    CMR_LGE_ischemic_extent_count +
+    CMR_LGE_ischemic_extent_categ +
+    CMR_LGE_ischemic_transmurality +
+    CMR_LGE_ischemic_location_4 +
+    
+    CMR_LGE_ischemic_anterior + 
+    CMR_LGE_ischemic_septal +
+    CMR_LGE_ischemic_inferior +
+    CMR_LGE_ischemic_lateral +
+    CMR_LGE_ischemic_Apical +
+    
+    CMR_LGE_midwall_presence +
+    CMR_LGE_midwall_extent_count + 
+    CMR_LGE_midwall_extent_categ +
+    CMR_LGE_midwall_location_3 + 
+    CMR_LGE_midwall_location_4 +
+    CMR_LGE_midwall_anterior +
+    CMR_LGE_midwall_septal +
+    CMR_LGE_midwall_inferior +
+    CMR_LGE_midwall_lateral +
+    CMR_LGE_midwall_apical,
+  data= df_selected,
+  method = 1, conf.level = 0.95),
+  hide.no = "No",
+  show.ratio =T, show.p.ratio =  T) 
+
+export2md(Descr_table, strip=TRUE, first.strip=TRUE)
+
+export2word(x = Descr_table, 
+            file = here(tables_output_dir, paste0("Tab8-univ-mid-death-",Sys.Date(), ".docx")), 
+            which.table="descr", nmax=TRUE, header.labels=c(), 
+            caption=NULL, strip=FALSE, first.strip=FALSE, background="#D2D2D2",
+            size=NULL, header.background=NULL, header.color=NULL)
+
+
+
+```
+### Tab9-multi-mid-death
+"Part of Table 3"
+```{r Tab9-multi-mid-death}
+df <- df_all %>% 
+  filter(
+    CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE"
+    ) %>% 
+  mutate(
+    event = outcome_death,
+    time = outcome_FU_time_death,
+    CMR_LVEF_5 = CMR_LVEF/5
+    ) %>% 
+  select(
+    event, time,
+    demo_age, demo_gender, demo_BMI , CV_risk_diabete , CV_risk_Smoking , CV_risk_HTA,  CV_risk_Smoking, CV_risk_dyslipidemia ,  history_hospit_HF, history_AFib, med_CKD, history_med_MI , CMR_LVEF_5, CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_location_3, CMR_LGE_midwall_extent_count
+    ) %>%
+  droplevels()
+
+# Define models
+models <- list(
+  model1 = coxph(Surv(time, event) ~ ., data = df %>% select(event:CMR_LVEF_5)),
+  model2 = coxph(Surv(time, event) ~ ., data = df %>% select(event:CMR_LGE_ischemic_extent_count)),
+  model4 = coxph(Surv(time, event) ~ ., data = df %>% select(event:CMR_LGE_midwall_extent_count))
+)
+
+# Extract model statistics and combine
+model_stats <- lapply(models, extract_model_stats) # adaptation possible to have more decimals
+
+# Rename the columns in each dataframe to include the model name
+model_stats_named <- lapply(names(model_stats), function(model_name) {
+  data <- model_stats[[model_name]]
+  # Ensure row names are in a column (if not already)
+  if (!"A_Variable" %in% colnames(data)) {
+    data$A_Variable <- rownames(data)
+  }
+  # Rename other columns to include the model name for uniqueness
+  colnames(data)[-which(colnames(data) == "A_Variable")] <- paste(colnames(data)[-which(colnames(data) == "A_Variable")], model_name, sep = "_")
+  return(data)
+})
+
+# Combine all models using full_join, join by 'Variable'
+combined_models <- purrr::reduce(model_stats_named, full_join, by = "A_Variable")
+
+# Set 'Variable' as rownames and remove 'Variable' from the dataframe columns
+rownames(combined_models) <- combined_models$A_Variable
+combined_models$A_Variable <- NULL
+
+
+# export in html
+knitr::kable(combined_models, caption = "Models multi- midwall pop (N=702)", format = "html") %>%
+  kableExtra::kable_styling(full_width = F, bootstrap_options = c("striped", "hover", "condensed", "bordered"))
+
+combined_models$A_Variable <- rownames(combined_models)
+
+# Make A_Variable the first column
+combined_models <- combined_models %>%
+  select(A_Variable, everything())
+
+# Export in word
+ft <- flextable(combined_models)
+ft <- set_table_properties(ft, layout = "autofit")
+doc <- read_docx() %>%
+  body_add_par("Model full - midwall pop (N=702)", style = "heading 1") %>%
+  body_add_flextable(ft)
+
+print(doc, target = here(tables_output_dir,paste0("Tab9-multi-mid-death-",Sys.Date(), ".docx")))
+```
+### Tab10-incr-mid-death 
+function could be improved (probably since there is bootstrapping etc, the ideal would be to save somewhere the results and to recalculate only if parameters changes). For the future me. 
+"Supplementary Figure 3. Incremental prognostic value of the presence of midwall-LGE in the overall population (N=6,082)"
+```{r Tab10-incr-mid-death }
+df <- df_all %>% 
+  filter(
+    CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE"
+    ) %>% 
+  mutate(
+    event = outcome_death,
+    time = outcome_FU_time_death,
+    CMR_LVEF_5 = CMR_LVEF/5
+    ) %>% 
+  select(
+    event, time,
+    demo_age, demo_gender, demo_BMI , CV_risk_diabete , CV_risk_Smoking , CV_risk_HTA,  CV_risk_Smoking, CV_risk_dyslipidemia ,  history_hospit_HF, history_AFib, med_CKD, history_med_MI , CMR_LVEF_5, CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_location_3, CMR_LGE_midwall_extent_count
+    ) %>%
+  droplevels()
+
+var_base = c("demo_age", "demo_gender" , "demo_BMI" , "CV_risk_diabete" , "CV_risk_HTA", "CV_risk_Smoking" , "CV_risk_dyslipidemia" ,  "history_hospit_HF", "history_AFib" , "med_CKD" , "history_med_MI" , "CMR_LVEF_5")
+
+
+D <- incremental_function(
+  df = df,
+  event = "event",
+  time = "time",
+  time_analyzed = median(df_all$outcome_FU_time_death/12), # big debate on which value to use (use in NRI and IDI) > just for NRI and IDI
+  var_1 = var_base,
+  var_2 = c(var_base,c("CMR_LGE_ischemic_extent_count")),
+  var_3 = c(var_base,c("CMR_LGE_ischemic_extent_count", "CMR_LGE_midwall_location_3", "CMR_LGE_midwall_extent_count")))
+
+D
+```
+
+## Figures
+### Fig6-mid-KM-LGE_midwall_location
+" Panel B1 central figure"
+```{r Fig6-mid-KM-LGE_midwall_location}
+df <- df_all %>% 
+  filter(
+    CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE"
+    ) %>% 
+  mutate(
+    event = outcome_death,
+    time = outcome_FU_time_death,
+    CMR_LVEF_5 = CMR_LVEF/5
+    ) %>% 
+  select(
+    event, time,
+    demo_age, demo_gender, demo_BMI , CV_risk_diabete , CV_risk_Smoking , CV_risk_HTA,  CV_risk_Smoking, CV_risk_dyslipidemia ,  history_hospit_HF, history_AFib, med_CKD, history_med_MI , CMR_LVEF_5, CMR_LGE_ischemic_extent_count, CMR_LGE_midwall_location_3, CMR_LGE_midwall_extent_count
+    ) %>%
+  droplevels()
+
+# Data parameters
+results <- createSurvivalPlot(
+  data = df,
+  compared_with = "CMR_LGE_midwall_location_3",
+  show.pval = F,
+  time = "time",
+  event = "event",
+  my_colors = c("#FF002B","#2C3E50"),
+  confint_choosen = 0.95,
+  mytitle = "Fig6: midwall location (midwall pop = 702)"
+)
+
+results$HR
+results$ggsurv
+
+# Save the plot in a folder 
+ggsave(
+  filename = here(figures_output_dir, paste0("Fig6-mid-KM-LGE_midwall_location_plot-", Sys.Date(),".png")),
+  plot = results$ggsurv$plot, width = 10, height = 6, units = "in", dpi = 600)
+ggsave(
+  filename = here(figures_output_dir,paste0("Fig6-mid-KM-LGE_midwall_location_risk-", Sys.Date(),".png")),
+  plot = results$ggsurv$table, width = 10, height = 3, units = "in", dpi = 600)
+```
+### Fig7-mid-KM-LGE_midwall_extent
+" Panel B2 central figure"
+```{r Fig7-mid-KM-LGE_midwall_extent}
+df <- df_all %>% 
+  filter(
+    CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE"
+    ) %>% 
+  mutate(
+    event = outcome_death,
+    time = outcome_FU_time_death,
+    CMR_LVEF_5 = CMR_LVEF/5
+    ) %>% 
+  droplevels()
+
+# Data parameters
+results <- createSurvivalPlot(
+  data = df,
+  compared_with = "CMR_LGE_midwall_extent_categ",
+  show.pval = F,
+  time = "time",
+  event = "event",
+  my_colors = c("#FF002B","#2C3E50"),
+  confint_choosen = 0.95,
+  mytitle = "Fig7: midwall extent (midwall pop = 702)"
+)
+
+results$HR
+results$ggsurv
+
+# Save the plot in a folder 
+ggsave(
+  filename = here(figures_output_dir, paste0("Fig7-mid-KM-LGE_midwall_extent_plot-", Sys.Date(),".png")),
+  plot = results$ggsurv$plot, width = 10, height = 6, units = "in", dpi = 600)
+ggsave(
+  filename = here(figures_output_dir,paste0("Fig7-mid-KM-LGE_midwall_extent_risk-", Sys.Date(),".png")),
+  plot = results$ggsurv$table, width = 10, height = 3, units = "in", dpi = 600)
+```
+### Fig8-mid-KM-LGE_midwall_with_ischemic
+" Panel B3 central figure"
+```{r Fig8-mid-KM-LGE_midwall_with_ischemic}
+df <- df_all %>% 
+  filter(
+    CMR_LGE_midwall_presence == "B_Presence_of_midwall_LGE"
+    ) %>% 
+  mutate(
+    event = outcome_death,
+    time = outcome_FU_time_death,
+    CMR_LVEF_5 = CMR_LVEF/5
+    ) %>% 
+  droplevels()
+
+# Data parameters
+results <- createSurvivalPlot(
+  data = df,
+  compared_with = "CMR_LGE_ischemic_presence",
+  show.pval = F,
+  time = "time",
+  event = "event",
+  my_colors = c("#FF002B","#2C3E50"),
+  confint_choosen = 0.95,
+  mytitle = "Fig8: midwall with isch (midwall pop = 702)"
+)
+
+results$HR
+results$ggsurv
+
+# Save the plot in a folder 
+ggsave(
+  filename = here(figures_output_dir, paste0("Fig8-mid-KM-LGE_midwall_with_ischemic_plot-", Sys.Date(),".png")),
+  plot = results$ggsurv$plot, width = 10, height = 6, units = "in", dpi = 600)
+ggsave(
+  filename = here(figures_output_dir,paste0("Fig8-mid-KM-LGE_midwall_with_ischemic_risk-", Sys.Date(),".png")),
+  plot = results$ggsurv$table, width = 10, height = 3, units = "in", dpi = 600)
+```
